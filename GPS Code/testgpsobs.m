@@ -26,7 +26,7 @@
 
 function obs = obs_read(filepath)
 %D:\Third Year\ESSE 3670\Project 3\Data Downloaded\datasets to try with\algo\algo112008\ALGO0010.08O
-file = fopen("Pixel4_GnssLog.21o");   %39ea118x.21o  %Pixel4_GnssLog.21o  %("Pixel4XLModded_GnssLog.20o");  %fopen("ALGO0010.08O");
+file = fopen(filepath);   %39ea118x.21o  %Pixel4_GnssLog.21o  %("Pixel4XLModded_GnssLog.20o");  %fopen("ALGO0010.08O");
 disp('------------------Begin reading obs file---------------------');
 %read constant parameters
 curr_line = fgetl(file); %fget1 %fopen %fgetl

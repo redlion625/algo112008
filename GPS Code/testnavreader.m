@@ -34,7 +34,7 @@ function Nav = Nav_reader(Navemerisfile);
 disp('------------------Begin reading navigation file---------------------');
 RI = 1;         % receiver indicator defined here for now, later pull out from header.
 C1=[]; L1=[]; D1=[]; S1=[]; P2=[]; L2=[]; D2=[];  S2=[];
-fidobs = fopen('brdm1180.21p');    % open observation file
+fidobs = fopen(Navemerisfile);    % open observation file
 % obsdata_interval=10;    % late pull out from header
 head_lines = 0;         % initilize
 Nav= struct();

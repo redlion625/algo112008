@@ -6,9 +6,11 @@ format long g
 
 
 %Reading the observation and navigation data into the program
-Nav_data = testnavreader("D:\Third Year\ESSE 3670\Project 3\Data Downloaded\datasets to try with\algo\algo112008\brdm1180.21p");
-Obs_data = testgpsobs("D:\Third Year\ESSE 3670\Project 3\Data Downloaded\datasets to try with\algo\algo112008\Pixel4_GnssLog.21o");  %Pixel4_GnssLog.21o %39ea118x.21o
 
+% Nav_data = testnavreader("D:\Third Year\ESSE 3670\Project 3\Data Downloaded\datasets to try with\algo\algo112008\brdm1180.21p");
+% Obs_data = testgpsobs("D:\Third Year\ESSE 3670\Project 3\Data Downloaded\datasets to try with\algo\algo112008\Pixel4_GnssLog.21o");  %Pixel4_GnssLog.21o %39ea118x.21o
+Nav_data = testnavreader("brdm1180.21p");
+Obs_data = testgpsobs("Pixel4_GnssLog.21o");  %Pixel4_GnssLog.21o %39ea118x.21o
 
 %% Match observation and navgitation data
 Observations = Obs_data.data;
@@ -296,7 +298,7 @@ end
     
 VT = table('Size',[size(CombinedTable)], 'VariableTypes', {'double', 'double', 'double', 'double'}, 'VariableNames',{'Lat','Long','Height','Epoch'});
 VT{:,:}=CombinedTable;
-%writetable(VT,'residual_stats.csv');
+writetable(VT,'LLH_T.csv');
 
 %Holds all of azimuth, elevation, and tropospheric data and sorts them by satellite rather
 %than by time for plotting purposes
