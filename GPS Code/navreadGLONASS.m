@@ -3,6 +3,7 @@ function nav = navreadGLONASS(filename)
 % from GLONASS of RINEX v. 2 format
 % into nav struct with an instance for each epoch
 
+
 %filename='brdc1180.21g';
 fid=fopen(filename);
 
@@ -48,25 +49,25 @@ while ~feof(fid)
     % read line 2
     line=fgetl(fid);
     temp=fixedWidth(line,[22 19 19 19]);
-    nav(i).xpos=str2num(temp(1));
-    nav(i).xvel=str2num(temp(2));
-    nav(i).xacc=str2num(temp(3));
+    nav(i).xpos=str2num(temp(1))*1000; % km->m
+    nav(i).xvel=str2num(temp(2))*1000;
+    nav(i).xacc=str2num(temp(3))*1000;
     nav(i).sathealth=str2num(temp(4));
 
     % read line 3
     line=fgetl(fid);
     temp=fixedWidth(line,[22 19 19 19]);
-    nav(i).ypos=str2num(temp(1));
-    nav(i).yvel=str2num(temp(2));
-    nav(i).yacc=str2num(temp(3));
+    nav(i).ypos=str2num(temp(1))*1000;
+    nav(i).yvel=str2num(temp(2))*1000;
+    nav(i).yacc=str2num(temp(3))*1000;
     nav(i).freqnum=str2num(temp(4));
 
     % read line 4
     line=fgetl(fid);
     temp=fixedWidth(line,[22 19 19 19]);
-    nav(i).zpos=str2num(temp(1));
-    nav(i).zvel=str2num(temp(2));
-    nav(i).zacc=str2num(temp(3));
+    nav(i).zpos=str2num(temp(1))*1000;
+    nav(i).zvel=str2num(temp(2))*1000;
+    nav(i).zacc=str2num(temp(3))*1000;
     nav(i).ageop=str2num(temp(4));
 
     i=i+1;
