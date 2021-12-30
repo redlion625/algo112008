@@ -436,6 +436,13 @@ end
 % xlabel('Epoch Number');
 hold off
 
+exportgraphics(f1,'testsatnum.png')
+exportgraphics(f2,'testlocalcoord.png')
+exportgraphics(f3,'testtroperr.png')
+exportgraphics(f4,'testenuerror.png')
+exportgraphics(f5,'testdop.png')
+exportgraphics(f6,'testv.png')
+
 
 
 
