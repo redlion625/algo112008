@@ -107,11 +107,11 @@ while line~=-1      % do until end of file is reach where fgets returns -1
             data(i_epoch,31) = str2num(line(25:42)); %Fit Interval
         end
         line = fgets(fidobs);
-    %if statement
-    
+        %if statement
+        
     elseif(line(1) ~= 'G')
         break
-
+        
     end
 end
 %     if(line(1) == 'R')

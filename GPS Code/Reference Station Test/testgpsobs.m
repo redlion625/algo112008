@@ -35,6 +35,9 @@ obs.pos_xyz = [];
 obs.ant_delta_HEN = [];
 obs.num_typeobs = [];
 obs.type_obs = [];
+sysCount=0;
+%obsTypes=struct;
+%obsTypes=table;
 
 
 while isempty(strfind(curr_line,'END OF HEADER'))
@@ -55,10 +58,20 @@ while isempty(strfind(curr_line,'END OF HEADER'))
         temp = strsplit(curr_line);
         obs.num_typeobs = str2double(temp(2));
         obs.type_obs = temp(3:obs.num_typeobs+2);
+    elseif contains(curr_line,'SYS / # / OBS TYPES')
+        obsTypes=table('Size',[4 2],'VariableTypes',{'string','cellstr'},'VariableNames',{'sys','obsTypes'}); % only BDS,GPS,GLO, GAL included
+        numSys=1;
+        while contains(curr_line,'SYS / # / OBS TYPES')
+            temp=fixedWidth(curr_line,[1 5 4 4 4 4 4 4 4 4]);
+            numObs=str2num(temp(2));
+            obsTypes{numSys,:}={strip(temp(1)), cellstr(strip(temp(3:2+numObs)))};
+            curr_line = fgetl(file);
+            numSys=numSys+1;
+        end
+        %curr_line = fgetl(file); %fgetl or fget1
     end
-    curr_line = fgetl(file); %fgetl or fget1
+    curr_line= fgetl(file);
 end
-
 %% Helper function
 %  Standardizes length of data lines to dicern which observables are missing
     function lineOut = fillWhite(line)
@@ -73,7 +86,9 @@ end
 
 obs.data_headers = {'Pseudorange', 'Phase', 'Doppler', 'Raw Signal Strength'};  %{'PRN',obs.type_obs{:},'Nav Ind','Sat ECF X','Sat ECF Y','Sat ECF Z','Delta tsv'};
 obs.struct_headers = {'Pseudorange', 'Phase', 'Doppler', 'Raw Signal Strength'}; %{'Epoch Time','Data','Rec. ECF X','Rec. ECF Y','Rec. ECF Z','Rec. Clock Error','LS Iterations','Residuals','Cov. Matrix'};
-data = cell(2880,2); % using 2 obs/min * 60 mins/hr 24hr/day
+data = cell(2880,3); % using 2 obs/min * 60 mins/hr 24hr/day
+
+%gloobs=table('Size',[1 ])
 
 epoch = 1;
 n = 1;
@@ -108,6 +123,7 @@ while ~feof(file)
         str = 'G';
         expression = line(1);
         startIndex = regexp(str,expression);
+        glotab=table('Size')
         if(startIndex > 0)
             %% GPS
             if(line(1) == 'G')
@@ -115,10 +131,10 @@ while ~feof(file)
                 epoch_data(j,2) = str2num(line(2:3));
                 %ta(j,2) = str2num(line(2:3));
                 
-                % what I found for RINEX 3.03
-                % length of epoch header is always 58 chars
-                % e.g. > 2021 04 28 22 19 09.4338961  0 20      
-                % length of single satellite observable is always 131
+                % what I found for RINEX 3.04
+                % length of epoch header is always 58+/-1 chars
+                % e.g. > 2021 04 28 22 19 09.4338961  0 20
+                % length of single satellite observable is always 131+/1
                 % e.g. G02  21079535.95424     22854.81024     -1311.29724        26.40024
                 
                 if(83 > (numel(line)))
@@ -199,6 +215,8 @@ while ~feof(file)
                 line = fgetl(file);
                 % To be completed
             elseif line(1) == 'R'
+                temp=strsplit(strip(line));
+                
                 line = fgetl(file);
             elseif line(1) == 'J'
                 line = fgetl(file);
