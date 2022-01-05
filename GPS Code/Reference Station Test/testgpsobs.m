@@ -24,6 +24,9 @@
 %           information; PRN-L1-C1 so on. The observables are ordered per
 %           the obs file layout
 
+% Notes: 
+%   observation entries with spaces are missing values and should be ignored
+
 function obs = testgpsobs(filepath)%obs_read(filepath)
 %D:\Third Year\ESSE 3670\Project 3\Data Downloaded\datasets to try with\algo\algo112008\ALGO0010.08O
 file = fopen(filepath);   %39ea118x.21o  %Pixel4_GnssLog.21o  %("Pixel4XLModded_GnssLog.20o");  %fopen("ALGO0010.08O");
@@ -38,7 +41,7 @@ obs.type_obs = [];
 sysCount=0;
 %obsTypes=struct;
 %obsTypes=table;
-
+obsTypes=table('Size',[1 2],'VariableTypes',{'string','cellstr'},'VariableNames',{'sys','obsNames'});
 
 while isempty(strfind(curr_line,'END OF HEADER'))
     if ~isempty(strfind(curr_line,'REC # / TYPE / VERS'))
@@ -59,7 +62,6 @@ while isempty(strfind(curr_line,'END OF HEADER'))
         obs.num_typeobs = str2double(temp(2));
         obs.type_obs = temp(3:obs.num_typeobs+2);
     elseif contains(curr_line,'SYS / # / OBS TYPES')
-        obsTypes=table('Size',[4 2],'VariableTypes',{'string','cellstr'},'VariableNames',{'sys','obsTypes'}); % only BDS,GPS,GLO, GAL included
         numSys=1;
         while contains(curr_line,'SYS / # / OBS TYPES')
             temp=fixedWidth(curr_line,[1 5 4 4 4 4 4 4 4 4]);
@@ -119,196 +121,211 @@ while ~feof(file)
     epoch_data = zeros(num_sat,obs.num_typeobs+6);
     epoch_data(:,1) = sat_PRN;
     line = curr_line;
+    gloobsCount=0;
+    rowGLO=find(obsTypes.sys=="R");
+    obsNames=cat(2,{'satNum'},obsTypes.obsNames{rowGLO});
+    varTypes=strings([1 numel(obsNames)]);
+    varTypes(:,:)="double";
+    gloobsRecord=table('Size',[1 5],'VariableTypes',varTypes,'VariableNames',obsNames);
     for j = 1:num_sat
-        str = 'G';
-        expression = line(1);
-        startIndex = regexp(str,expression);
-        glotab=table('Size')
-        if(startIndex > 0)
-            %% GPS
-            if(line(1) == 'G')
-                epoch_data(j,1) = 1;
-                epoch_data(j,2) = str2num(line(2:3));
-                %ta(j,2) = str2num(line(2:3));
-                
-                % what I found for RINEX 3.04
-                % length of epoch header is always 58+/-1 chars
-                % e.g. > 2021 04 28 22 19 09.4338961  0 20
-                % length of single satellite observable is always 131+/1
-                % e.g. G02  21079535.95424     22854.81024     -1311.29724        26.40024
-                
-                if(83 > (numel(line)))
-                    epoch_data(j,7) = 0.0000000;
-                elseif((line(70:83)) == '              ')
-                    epoch_data(j,7) = 0.0000000;
-                else
-                    line(70:83) = spacereplace(line(70:83));
-                    epoch_data(j,7) = str2num(line(70:83));
-                end
-                if(99 > (numel(line)))
-                    epoch_data(j,8) = 0.0000000;
-                elseif((line(88:99)) == '            ')
-                    epoch_data(j,8) = 0.0000000;
-                else
-                    line(88:99) = spacereplace(line(88:99));
-                    epoch_data(j,8) = str2num(line(88:99));
-                end
-                if(115 > (numel(line)))
-                    epoch_data(j,9) = 0.0000000;
-                elseif((line(105:115)) == '           ')
-                    epoch_data(j,9) = 0.0000000;
-                else
-                    line(105:115) = spacereplace(line(105:115));
-                    epoch_data(j,9) = str2num(line(105:115));
-                end
-                if(131 > (numel(line)))
-                    epoch_data(j,10) = 0.0000000;
-                elseif((line(124:131)) == '        ')
-                    epoch_data(j,10) = 0.0000000;
-                else
-                    line(124:131) = spacereplace(line(124:131));
-                    epoch_data(j,10) = str2num(line(124:131));
-                end
-                
-                %end
-                if(19 > (numel(line)))
-                    epoch_data(j,3) = 0.0000000;
-                elseif((line(6:19)) == '              ')
-                    %continue;
-                    epoch_data(j,:) = 0.0000000;
-                    line = fgetl(file);
-                    continue;
-                else
-                    line(6:19) = spacereplace(line(6:19));
-                    epoch_data(j,3) = str2num(line(6:19));
-                end
-                if(35 > (numel(line)))
-                    epoch_data(j,4) = 0.0000000;
-                elseif((line(23:35)) == '             ')
-                    epoch_data(j,:) = 0.0000000;
-                    line = fgetl(file);
-                    continue;
-                else
-                    line(23:35) = spacereplace(line(23:35));
-                    epoch_data(j,4) = str2num(line(23:35));
-                end
-                if(51 > (numel(line)))
-                    epoch_data(j,5) = 0.0000000;
-                elseif((line(41:51)) == '           ')
-                    epoch_data(j,:) = 0.0000000;
-                    line = fgetl(file);
-                    continue;
-                else
-                    line(41:51) = spacereplace(line(41:51));
-                    epoch_data(j,5) = str2num(line(41:51));
-                end
-                if(67 > (numel(line)))
-                    epoch_data(j,6) = 0.0000000;
-                elseif((line(60:67)) == '        ')
-                    epoch_data(j,:) = 0.0000000;
-                    line = fgetl(file);
-                    continue;
-                else
-                    line(60:67) = spacereplace(line(60:67));
-                    epoch_data(j,6) = str2num(line(60:67));
-                end
-                line = fgetl(file);
-                % To be completed
-            elseif line(1) == 'R'
-                temp=strsplit(strip(line));
-                
-                line = fgetl(file);
-            elseif line(1) == 'J'
-                line = fgetl(file);
-            elseif line(1) == 'C'
-                line = fgetl(file);
-            elseif line(1) == 'E'
-                line = fgetl(file);
-            else
-                line = fgetl(file);
-                continue;             %epoch_data(j,1) = 4;
-            end
-            %                 epoch_data(j,2) = str2num(line(2:3));
+        %str = 'G';
+        %expression = line(1);
+        %startIndex = regexp(str,expression);
+        %glotab=table('Size')
+        %if(startIndex > 0)
+        %% GPS
+        if(line(1) == 'G')
+            epoch_data(j,1) = 1;
+            epoch_data(j,2) = str2num(line(2:3));
+            %ta(j,2) = str2num(line(2:3));
             
-            %                 if(83 > (numel(line)))
-            %                       epoch_data(j,7) = 0.0000000;
-            %                 elseif((line(70:83)) == '              ')
-            %                       epoch_data(j,7) = 0.0000000;
-            %                 else
-            %                       line(70:83) = spacereplace(line(70:83));
-            %                       epoch_data(j,7) = str2num(line(70:83));
-            %                 end
-            %                 if(99 > (numel(line)))
-            %                       epoch_data(j,8) = 0.0000000;
-            %                 elseif((line(88:99)) == '            ')
-            %                       epoch_data(j,8) = 0.0000000;
-            %                 else
-            %                       line(88:99) = spacereplace(line(88:99));
-            %                       epoch_data(j,8) = str2num(line(88:99));
-            %                 end
-            %                 if(115 > (numel(line)))
-            %                       epoch_data(j,9) = 0.0000000;
-            %                 elseif((line(105:115)) == '           ')
-            %                       epoch_data(j,9) = 0.0000000;
-            %                 else
-            %                      line(105:115) = spacereplace(line(105:115));
-            %                      epoch_data(j,9) = str2num(line(105:115));
-            %                 end
-            %                 if(131 > (numel(line)))
-            %                      epoch_data(j,10) = 0.0000000;
-            %                 elseif((line(124:131)) == '        ')
-            %                      epoch_data(j,10) = 0.0000000;
-            %                 else
-            %                      line(124:131) = spacereplace(line(124:131));
-            %                      epoch_data(j,10) = str2num(line(124:131));
-            %                 end
-            %
-            %                 %end
-            %                 if(19 > (numel(line)))
-            %                    epoch_data(j,3) = 0.0000000;
-            %                 elseif((line(6:19)) == '              ')
-            %                    %continue;
-            %                    epoch_data(j,:) = 0.0000000;
-            %                    line = fgetl(file);
-            %                    continue;
-            %                 else
-            %                    line(6:19) = spacereplace(line(6:19));
-            %                    epoch_data(j,3) = str2num(line(6:19));
-            %                 end
-            %                 if(35 > (numel(line)))
-            %                     epoch_data(j,4) = 0.0000000;
-            %                 elseif((line(23:35)) == '             ')
-            %                     epoch_data(j,:) = 0.0000000;
-            %                     line = fgetl(file);
-            %                     continue;
-            %                 else
-            %                      line(23:35) = spacereplace(line(23:35));
-            %                      epoch_data(j,4) = str2num(line(23:35));
-            %                 end
-            %                 if(51 > (numel(line)))
-            %                     epoch_data(j,5) = 0.0000000;
-            %                 elseif((line(41:51)) == '           ')
-            %                     epoch_data(j,:) = 0.0000000;
-            %                     line = fgetl(file);
-            %                     continue;
-            %                 else
-            %                      line(41:51) = spacereplace(line(41:51));
-            %                      epoch_data(j,5) = str2num(line(41:51));
-            %                 end
-            %                 if(67 > (numel(line)))
-            %                      epoch_data(j,6) = 0.0000000;
-            %                 elseif((line(60:67)) == '        ')
-            %                      epoch_data(j,:) = 0.0000000;
-            %                      line = fgetl(file);
-            %                      continue;
-            %                 else
-            %                      line(60:67) = spacereplace(line(60:67));
-            %                      epoch_data(j,6) = str2num(line(60:67));
-            %                 end
-            %                 line = fgetl(file);
+            % what I found for RINEX 3.04
+            % length of epoch header is always 58+/-1 chars
+            % e.g. > 2021 04 28 22 19 09.4338961  0 20
+            % length of single satellite observable is always 131+/1
+            % e.g. G02  21079535.95424     22854.81024     -1311.29724        26.40024
+            
+            if(83 > (numel(line)))
+                epoch_data(j,7) = 0.0000000;
+            elseif((line(70:83)) == '              ')
+                epoch_data(j,7) = 0.0000000;
+            else
+                line(70:83) = spacereplace(line(70:83));
+                epoch_data(j,7) = str2num(line(70:83));
+            end
+            if(99 > (numel(line)))
+                epoch_data(j,8) = 0.0000000;
+            elseif((line(88:99)) == '            ')
+                epoch_data(j,8) = 0.0000000;
+            else
+                line(88:99) = spacereplace(line(88:99));
+                epoch_data(j,8) = str2num(line(88:99));
+            end
+            if(115 > (numel(line)))
+                epoch_data(j,9) = 0.0000000;
+            elseif((line(105:115)) == '           ')
+                epoch_data(j,9) = 0.0000000;
+            else
+                line(105:115) = spacereplace(line(105:115));
+                epoch_data(j,9) = str2num(line(105:115));
+            end
+            if(131 > (numel(line)))
+                epoch_data(j,10) = 0.0000000;
+            elseif((line(124:131)) == '        ')
+                epoch_data(j,10) = 0.0000000;
+            else
+                line(124:131) = spacereplace(line(124:131));
+                epoch_data(j,10) = str2num(line(124:131));
+            end
+            
+            %end
+            if(19 > (numel(line)))
+                epoch_data(j,3) = 0.0000000;
+            elseif((line(6:19)) == '              ')
+                %continue;
+                epoch_data(j,:) = 0.0000000;
+                line = fgetl(file);
+                continue;
+            else
+                line(6:19) = spacereplace(line(6:19));
+                epoch_data(j,3) = str2num(line(6:19));
+            end
+            if(35 > (numel(line)))
+                epoch_data(j,4) = 0.0000000;
+            elseif((line(23:35)) == '             ')
+                epoch_data(j,:) = 0.0000000;
+                line = fgetl(file);
+                continue;
+            else
+                line(23:35) = spacereplace(line(23:35));
+                epoch_data(j,4) = str2num(line(23:35));
+            end
+            if(51 > (numel(line)))
+                epoch_data(j,5) = 0.0000000;
+            elseif((line(41:51)) == '           ')
+                epoch_data(j,:) = 0.0000000;
+                line = fgetl(file);
+                continue;
+            else
+                line(41:51) = spacereplace(line(41:51));
+                epoch_data(j,5) = str2num(line(41:51));
+            end
+            if(67 > (numel(line)))
+                epoch_data(j,6) = 0.0000000;
+            elseif((line(60:67)) == '        ')
+                epoch_data(j,:) = 0.0000000;
+                line = fgetl(file);
+                continue;
+            else
+                line(60:67) = spacereplace(line(60:67));
+                epoch_data(j,6) = str2num(line(60:67));
+            end
+            line = fgetl(file);
+            % To be completed
+        elseif line(1) == 'R'
+            gloobsCount=gloobsCount+1;
+            temp=fixedWidth(line,[1 2 16*ones(1,numel(obsNames)-1)]);
+%             for ind = 3:numel(temp)
+%                 if contains(strip(temp(ind))," ")
+%                     temp(ind)=""; % when converting string array to 
+%                 end
+%             end
+            %C=mat2cell(str2double(temp(2:end)),1,[ones(1,numel(obsNames))]);
+            gloobsRecord{gloobsCount,:}=str2double(temp(2:end)); 
+            % considers observations with spaces as missing data and returns
+            % NaN
+            line = fgetl(file);
+        elseif line(1) == 'J'
+            line = fgetl(file);
+        elseif line(1) == 'C'
+            line = fgetl(file);
+        elseif line(1) == 'E'
+            line = fgetl(file);
         else
             line = fgetl(file);
+            continue;             %epoch_data(j,1) = 4;
         end
+        %                 epoch_data(j,2) = str2num(line(2:3));
+        
+        %                 if(83 > (numel(line)))
+        %                       epoch_data(j,7) = 0.0000000;
+        %                 elseif((line(70:83)) == '              ')
+        %                       epoch_data(j,7) = 0.0000000;
+        %                 else
+        %                       line(70:83) = spacereplace(line(70:83));
+        %                       epoch_data(j,7) = str2num(line(70:83));
+        %                 end
+        %                 if(99 > (numel(line)))
+        %                       epoch_data(j,8) = 0.0000000;
+        %                 elseif((line(88:99)) == '            ')
+        %                       epoch_data(j,8) = 0.0000000;
+        %                 else
+        %                       line(88:99) = spacereplace(line(88:99));
+        %                       epoch_data(j,8) = str2num(line(88:99));
+        %                 end
+        %                 if(115 > (numel(line)))
+        %                       epoch_data(j,9) = 0.0000000;
+        %                 elseif((line(105:115)) == '           ')
+        %                       epoch_data(j,9) = 0.0000000;
+        %                 else
+        %                      line(105:115) = spacereplace(line(105:115));
+        %                      epoch_data(j,9) = str2num(line(105:115));
+        %                 end
+        %                 if(131 > (numel(line)))
+        %                      epoch_data(j,10) = 0.0000000;
+        %                 elseif((line(124:131)) == '        ')
+        %                      epoch_data(j,10) = 0.0000000;
+        %                 else
+        %                      line(124:131) = spacereplace(line(124:131));
+        %                      epoch_data(j,10) = str2num(line(124:131));
+        %                 end
+        %
+        %                 %end
+        %                 if(19 > (numel(line)))
+        %                    epoch_data(j,3) = 0.0000000;
+        %                 elseif((line(6:19)) == '              ')
+        %                    %continue;
+        %                    epoch_data(j,:) = 0.0000000;
+        %                    line = fgetl(file);
+        %                    continue;
+        %                 else
+        %                    line(6:19) = spacereplace(line(6:19));
+        %                    epoch_data(j,3) = str2num(line(6:19));
+        %                 end
+        %                 if(35 > (numel(line)))
+        %                     epoch_data(j,4) = 0.0000000;
+        %                 elseif((line(23:35)) == '             ')
+        %                     epoch_data(j,:) = 0.0000000;
+        %                     line = fgetl(file);
+        %                     continue;
+        %                 else
+        %                      line(23:35) = spacereplace(line(23:35));
+        %                      epoch_data(j,4) = str2num(line(23:35));
+        %                 end
+        %                 if(51 > (numel(line)))
+        %                     epoch_data(j,5) = 0.0000000;
+        %                 elseif((line(41:51)) == '           ')
+        %                     epoch_data(j,:) = 0.0000000;
+        %                     line = fgetl(file);
+        %                     continue;
+        %                 else
+        %                      line(41:51) = spacereplace(line(41:51));
+        %                      epoch_data(j,5) = str2num(line(41:51));
+        %                 end
+        %                 if(67 > (numel(line)))
+        %                      epoch_data(j,6) = 0.0000000;
+        %                 elseif((line(60:67)) == '        ')
+        %                      epoch_data(j,:) = 0.0000000;
+        %                      line = fgetl(file);
+        %                      continue;
+        %                 else
+        %                      line(60:67) = spacereplace(line(60:67));
+        %                      epoch_data(j,6) = str2num(line(60:67));
+        %                 end
+        %                 line = fgetl(file);
+        %         else
+        %             line = fgetl(file);
+        %         end
         
     end
     ind = find(sum(epoch_data,2)==0) ;
@@ -316,6 +333,7 @@ while ~feof(file)
     
     curr_line = line;
     data{epoch,2} = epoch_data;
+    data{epoch,3}=gloobsRecord;
     epoch = epoch +1;
     n = n + 1;
 end
