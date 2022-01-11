@@ -39,7 +39,7 @@ end
 
 %% Loop through each satellite
 f1 = 1575.42e6; %L1
-f2 = 1227.6e6; %L2
+f2 = 1176.45e6; %L5
 gravitationalparameter = 3.986005e14; %WGS84 value of the Earth's gravitational constant for GPS
 earthrotation = 7.2921151467e-5; %WGS84 value of the Earth's rotation rate
 c = 2.99792458e8; %Speed of light
@@ -52,9 +52,14 @@ for i = 1:length(Observations) %Iterating through the number of observations
      else
          
     for j = 1:obssize(1) %Iterating through the submatrix attached to the observation epoch
-        %P2 = Observations{i,2}(j,5); %P1 code
-        %P1 = Observations{i,2}(j,6); %P2 code
-        Pseudorange(i,j) = Observations{i,2}(j,3); %((f1^2)*P1 - (f2^2)*P2)/(f1^2-f2^2); %Calculating the uncorrected pseudorange
+        P2 = Observations{i,2}(j,7); %P2 code
+        P1 = Observations{i,2}(j,3); %P1 code
+%         if(P2 == 0)
+            Pseudorange(i,j)= P1; 
+%         else
+%             Pseudorange(i,j) = ((f1^2)/((f1^2) - (f2^2)))*(P1) - ((f2^2)/((f1^2) - (f2^2)))*(P2); % ((f1^2)*P1 - (f2^2)*P2)/(f1^2-f2^2);
+%         end        
+        %Pseudorange(i,j) = Observations{i,2}(j,3); %((f1^2)*P1 - (f2^2)*P2)/(f1^2-f2^2); %Calculating the uncorrected pseudorange
         index = Observations{i,2}(j,11); 
         sqrtA = Nav_data.data(index, 13); %Finding the semi-major axis
         A = (sqrtA)^2; %Finding the semi-major axis
@@ -289,7 +294,7 @@ for i = 1:length(Observations) %Iterating through the number of observations
     
     TrueLLHtrans(1:2) = TrueLLHtrans(1:2)*pi/180;
     TrueLLH = TrueLLHtrans';
-    TrueENU(i, :) = EC2ENU(TrueXYZ', TrueLLH);     %EC2ENU(TrueXYZ', Approxcoord, TrueLLH);
+    TrueENU(i, :) = EC2ENU(TrueXYZ', 0, TrueLLH);     %EC2ENU(TrueXYZ', Approxcoord, TrueLLH);
     
      end
 end
