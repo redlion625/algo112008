@@ -38,6 +38,7 @@ obs.pos_xyz = [];
 obs.ant_delta_HEN = [];
 obs.num_typeobs = [];
 obs.type_obs = [];
+obs.epochdata_headers={'GPST','GPS obs', 'GLO obs'};
 sysCount=0;
 %obsTypes=struct;
 %obsTypes=table;

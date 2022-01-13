@@ -38,7 +38,7 @@ C1=[]; L1=[]; D1=[]; S1=[]; P2=[]; L2=[]; D2=[];  S2=[];
 fidobs = fopen(Navemerisfile);    % open observation file
 % obsdata_interval=10;    % late pull out from header
 head_lines = 0;         % initilize
-Nav= struct();
+Nav=struct();
 navGLO=struct();
 
 %% Read header
@@ -61,7 +61,7 @@ while ~contains(line,'END OF HEADER')
         tSysCorr(countTimeCorr).a1=str2num(temp(3));
         tSysCorr(countTimeCorr).Tref=str2num(temp(4));
         tSysCorr(countTimeCorr).refWeekNum=str2num(temp(5));
-        Nav.tSysCorr=tSysCorr;
+
     elseif contains(line,'IONOSPHERIC CORR')
         temp=fixedWidth(line,[4 13 12 12 12]);
         countIonCorr=countIonCorr+1;
@@ -101,6 +101,7 @@ while ~contains(line,'END OF HEADER')
     end
     line = fgets(fidobs);
 end
+Nav.tSysCorr=tSysCorr;
 %% Store Navigation parameters for each constellation of every epoch
 line=fgets(fidobs); % get the first line of the body
 i_epoch = 0;        % index for measurement data epoch
@@ -227,7 +228,7 @@ end
 %       line = fgets(fidobs);
 %     end %if statement
 %end %while line1~=-1
-
+Nav.glonav=navGLO;
 Nav.data = data;
 disp('----------------Completed reading nav file-------------------');
 fclose('all');
