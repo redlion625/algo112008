@@ -148,9 +148,10 @@ The team's work software development centres around estalishing tasks in the [op
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com
-
-Project Link: [https://github.com/your_username/repo_name](https://github.com/your_username/repo_name)
+Jared Yen - [personal website](https://twitter.com/your_username) - email@example.com
+Melvin Gagarao - [personal website](https://twitter.com/your_username) - email@example.com
+Nathan Stachow - [personal website](https://twitter.com/your_username) - email@example.com
+Ryan Nguyen - [personal website](https://twitter.com/your_username) - email@example.com
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
