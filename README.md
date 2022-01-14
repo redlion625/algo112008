@@ -149,6 +149,7 @@ The team's work software development centres around estalishing tasks in the [op
 ## Contact
 
 Jared Yen - [personal website](https://twitter.com/your_username) - email@example.com
+
 Melvin Gagarao - [personal website](https://twitter.com/your_username) - email@example.com
 Nathan Stachow - [personal website](https://twitter.com/your_username) - email@example.com
 Ryan Nguyen - [personal website](https://twitter.com/your_username) - email@example.com
