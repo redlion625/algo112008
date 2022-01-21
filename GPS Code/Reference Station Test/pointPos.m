@@ -85,7 +85,7 @@ while(count < 40)
     thresh = [0.01; 0.01; 0.01; 1e-4]; %Determining the threshold at which the least squares loop with break
     count = count + 1; %Keeping track of how many iterations the loop makes
     if(all(abs(deltax) < thresh)) %If the delta values are less than the prescribed threshold values, the loop will break
-        fprintf("Loop is broken");
+        fprintf("Solution Converged");
        % resultcheck(i) = count;
         Final = xhat; %Storing the least squares estimates of the X, Y, and Z components of the receiver's position and the receiver clock offset
         v = A*deltax - mis; %Calculating the residuals

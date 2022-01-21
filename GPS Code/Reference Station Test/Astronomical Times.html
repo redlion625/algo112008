@@ -1,0 +1,333 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"> 
+<title>Astronomical Times</title>
+</head>
+<body cz-shortcut-listen="true">
+<h1>Astronomical Times</h1>
+
+<ul>
+	<li><a href="#at">Atomic Times</a>
+	<ul>
+		<li><a href="#TAI">TAI - International Atomic Time</a>
+		</li><li><a href="#UTC">UTC - Coordinated Universal Time</a>
+		</li><li><a href="#TDT">TDT - Terrestrial Dynamic Time (TT)</a>
+		</li><li><a href="#TDB">TDB - Barycentric Dynamic Time (TCB)</a>
+	</li></ul>
+	</li><li><a href="#ert">Earth Rotation Times</a>
+	<ul>
+		<li><a href="#UT1">UT1 - Universal Time</a>
+		</li><li><a href="#UT0">UT0</a>
+		</li><li><a href="#UT2">UT2</a>
+		</li><li><a href="#GMST">GMST - Greenwich Mean Sidereal Time</a>
+		</li><li><a href="#GAST">GAST - Greenwich Apparent Sidereal Time</a>
+		</li><li><a href="#LMST">LMST - Local Mean Sidereal Time</a>
+		</li><li><a href="#LST">LST - Local Sidereal Time</a>
+	</li></ul>
+	</li><li><a href="#ref">References</a>
+</li></ul>
+
+There are two widely used time standards.  One is the rotation of the
+earth, and the other is the frequency of atomic oscillations (mainly the
+cesium-133 atom).  The earth's rotation is not uniform.  Its rate exhibits
+both periodic changes and long term drifts on the order of a second per
+year.  Atomic standards are the closest approximations we currently have
+to a unform time with accuracies on the order of microseconds per year.
+
+<p>Since the advent of atomic time in 1955 there has been a steady transition
+from reliance on the earth's rotation to the use of atomic time as the
+primary standard.  Before atomic time, the closest approximation to a
+uniform time was Ephemeris Time (ET), which used the best available theory
+of the earth's rotation to remove its known changes in rotation rate.  The
+use of Ephemeris Time continued until 1984.  It was the time independent
+variable for planetary ephemerides until then.
+
+</p><p>Several important time scales still follow the rotation of the earth, most
+notably civil and sidereal time, but of these are now derived from atomic time
+through a combination of earth rotation theory and actual measurements of
+the earth's rotation and orientation.  Chapter 2 of the most recent
+Explanatory Supplement to the Astronomical Almanac <a href="#ref1">[ref
+1]</a> gives an extensive summary of time standards and a list of original
+literature references.  The kinds of time typically encountered in astronomy
+are briefly described below.
+
+</p><p>You will notice that many of the time acronyms are reversed from
+their full English names.  That's because they are acronyms from French (TAI
+= <em>Temps Atomique International</em>) since France has a long and
+continuing history as a primary source of time standards, now through the
+<em>Bureau International des Poids et Measures</em>.
+
+</p><h2><a name="at">Atomic Times</a></h2>
+
+<h3><a name="TAI">TAI - International Atomic Time</a></h3>
+
+International Atomic Time (TAI) is the primary time standard in the world
+today.  It is the combined input of many clocks around the world, each
+corrected for known environmental and relativistic effects.  A few clocks,
+such as the cesium clock ensemble at the U. S. Naval Observatory, carry
+considerable weight in the TAI.  In relativistic terms, TAI is an
+earth-based time since it is defined for a gravitational potential and
+inertial reference on the surface of the earth.  TAI is the standard for
+the SI (<em>System International</em>) second.  The zero point of TAI was
+somewhat arbitrarily defined by early atomic clocks, and it's offset from
+Ephemeris Time was precisely defined as 32.184 seconds for January 1,
+1977.  See <a href="#TDT">TDT</a> below.
+
+<h3><a name="UTC">UTC - Coordinated Universal Time</a></h3>
+
+Coordinated Universal Time (UTC) is the time broadcast by WWV and other
+services.  By definition, UTC and TAI have the same rate, but UTC stays
+close to Mean Solar Time by adding integer numbers of seconds, called leap
+seconds, from time to time.  This keeps solar noon at the same UTC
+(averaged over the year), even though the rotation of the earth is slowing
+down.  The offset is changed as needed to keep UTC within about 0.7
+seconds of earth rotation time, <a href="#UT1">UT1</a>.  Leap seconds are
+typically added once per year at the end of December or June, but they can
+be added (or subtracted) at other designated times throughout the year.  The
+offset between TAI and UTC is currently 30 seconds, e.g., 20:00:00 UTC =
+20:00:30 TAI.
+
+<pre>	UTC = TAI - (number of leap seconds)
+</pre>
+
+Before UTC, the time broadcast by WWV and other services was a close
+approximation to Greewich Mean Time (GMT) <a href="#ref2">[ref 2]</a>.
+GMT is an earth rotation time and is now called UT1 or simply UT.
+
+<h3><a name="TDT">TDT or TT - Terrestrial Dynamic Time</a></h3>
+
+Before atomic clocks, Ephemeris Time (ET) was the closest available
+approximation to a uniform time for planetary motion calculations.
+Terrestrial Dynamic Time, which is tied to atomic time by a constant
+offset of 32.184 seconds, replaced ET at the beginning of 1984.  The
+purpose of the offset is to maintain continuity between ET and TDT at
+the transition.  Planetary motions are now computed using <a href="https://lweb.cfa.harvard.edu/~jzhao/TDB">Barycentric Dynamic Time (TDB)</a>, which is more uniform
+than TT because it accounts for relativistic corrections due to the
+earth's motion in the gravitational potential of the solar system.
+
+<pre>	TT = TAI + 32.184 = UTC + (number of leap seconds) + 32.184
+</pre>
+
+There is a subtle relativistic distinction between coordinate time and
+dynamic time, which is not significant for most practical purposes.  The
+counterpart to TT is Geocentric Coordinate Time (TCG) which differs in
+rate from TT by about 0.7 parts per billion <a href="#ref3">[ref 3]</a>.
+TT and TCG were coincident on January 1, 1977 and now differ by 0.42
+seconds.  The rate difference from TT can be important to long term
+measurements, so make sure you know which time is being used when
+comparing observations.  Some physical constants are different in
+coordinate time.  You are not likely to encounter TCG in the literature.
+
+<h3><a name="TDB">TDB - Barycentric Dynamic Time</a></h3>
+
+Barycentric Dynamic Time (TDB) is the same as as Terrestrial Dynamic Time
+(TT) except for relativistic corrections to move the origin to the solar
+system barycenter.  These corrections amount to as much as about 1.6
+millisends and are periodic with an average of zero.  The
+dominant terms in this correction are have annual and semi-annual
+periods.
+
+<pre>	TDB = TT + 0.001658 sin( g ) + 0.000014 sin( 2g )  seconds
+where
+	g = 357.53 + 0.9856003 ( JD - 2451545.0 )	   degrees
+</pre>
+
+and JD is the Julian Date.  A more accurate formula, with adds terms
+smaller than 20 microseconds, is given in the Explanatory Supplement to
+the Astronomical Almanac <a href="#ref4">[ref 4]</a>.  Planetary motions
+are now computed using TDB.
+
+<p>There is a subtle relativistic distinction between coordinate time and
+dynamic time, which is not significant for most practical purposes.  The
+counterpart to TDB is Barycentric Coordinate Time (TCB) which differs in
+rate from TDB by about 15.5 parts per billion <a href="#ref5">[ref 5]</a>.
+TDB and TCB were coincident on January 1, 1977 and now differ by 9.3
+seconds.  The rate difference from TDB can be important to long term
+measurements, so make sure you know which time is being used when
+comparing observations.  Some physical constants are different in
+coordinate time.  You are not likely to encounter TCB in the literature.
+
+</p><h2><a name="ert">Earth Rotation Times</a></h2>
+
+<h3><a name="UT1">UT1 - Universal Time</a></h3>
+
+Universal Time (UT1) is a measure of the actual rotation of the earth,
+independent of observing location.  UT1 is essentially the same as the now
+discontinued Greenwich Mean Time (GMT).  It is the observed rotation of
+the earth with respect to the mean sun corrected for the observer's
+longitude with respect to the Greenwich Meridian and for the observer's
+small shift in longitude due to <a href="https://lweb.cfa.harvard.edu/~jzhao/earth_rot.html#polar_motion">polar motion</a>.
+
+<p>Since the earth's rotation is not uniform, the rate of UT1 is not
+constant, and its offset from atomic time is continually changing in a not
+completely predictable way.  As of December 1995, UT1 was drifting about
+0.8 seconds per year with respect to atomic time (TAI or UTC).  Since UTC
+is intentionally incremented by integer seconds (leap seconds) to stay
+within 0.7 seconds of UT1, the difference between UT1 and UTC is never
+greater than this.  The difference, DUT1 = UT1 - UTC is monitored by the
+International Earth Rotation Service and published weekly in <a href="file:///ser7/ser7.dat">IERS Bulletin A</a> along
+with predictions for a number of months into the future.
+
+</p><pre>              UT1 = UTC + DUT1 (from the IERS Bulletin A)
+</pre>
+
+Note that when a leap second is added to or subtracted from UTC, the value
+of DUT1 is discontinuous by one second.  UT1 is continuous, and UTC is
+incremented or decremented by integer seconds to stay witin 0.7 seconds of
+UT1.
+
+<h3><a name="UT0">UT0</a></h3>
+
+UT0 (UT-zero) is an observatory-specific version of UT1 in the sense that
+UT0 contains the effect of <a href="https://lweb.cfa.harvard.edu/~jzhao/earth_rot.html#polar_motion">polar
+motion</a> on the observed rotation of the earth.  Polar motion is
+equivalent to a change in latitude and longitude of points on the earth's
+surface with respect to the earth's instantaneous rotation axis.  Since
+UT1 is now determined from observations from an ensemble of obsevatories,
+often as part of VLBI interferometers, the practical use of UT0 has
+dwindled.  The conversion from UT1 to a local observatory time with
+respect to the mean sun or stars is now done as a set of coordinate
+rotations that do not explicitly use UT0 as an intermediate step.
+
+<p>From <a href="#ref8">ref [7]</a>
+
+</p><pre>    UT0 = UT1 + tan(lat) * (x * sin(long) + y * cos(long))
+</pre>
+
+where <tt>x</tt> and <tt>y</tt> are the pole offsets published in <a href="file:///ser7/ser7.dat">IERS Bulletin A</a>, and
+<tt>lat</tt> and <tt>long</tt> are the observatory's nominal station
+coordinates.
+
+<h3><a name="UT2">UT2</a></h3>
+
+UT2 appears to be of mostly historical interest.  Before 1972 the time
+broadcast services kept their time signals within 0.1 seconds of UT2,
+which is UT1 with annual and semiannual variations in the earth's
+rotation removed.  The formal relation between UT1 and UT2 is
+
+<pre>        UT2 = UT1 + 0.022 * sin(2 * Pi * t) - 0.012 * cos(2 * Pi * t)
+                  - 0.006 * sin(4 * Pi * t) + 0.007 * cos(4 * Pi * t)
+</pre>
+
+where
+
+<pre>	t = 2000.0 + (MJD - 51544.03) / 365.2422
+</pre>
+
+is the Besselian day fraction, and MJD is the Modified Julian Date (Julian
+Date - 2400000.5).  See <a href="#ref6">ref [6]</a> and the <a href="file:///ser7/iersexp.sup">Explanatory Supplement
+to IERS Bulletins A and B</a>.
+
+<h3><a name="GMST">GMST - Greenwich Mean Sidereal Time</a></h3>
+
+Sidereal time is the measure of the earth's rotation with respect to
+distant celestial objects.  Compare this to UT1, which is the rotation of
+the earth with respect to the mean position of the sun.  One sidereal
+second is approximately 365.25/366.25 of a UT1 second.  In other words,
+there is one more day in a sidereal year than in a solar year.
+
+<p>By convention, the reference points for Greenwich Sidereal Time
+are the Greenwich Meridian and the vernal equinox (the intersection
+of the planes of the earth's equator and the earth's orbit, the ecliptic).
+The Greenwich sidereal day begins when the vernal equinox is on the
+Greenwich Meridian.  Greenwich Mean Sidereal Time (GMST) is the hour angle
+of the average position of the vernal equinox, neglecting short term
+motions of the equinox due to <a href="https://lweb.cfa.harvard.edu/~jzhao/earth_rot.html#nut">nutation</a>.
+
+</p><p>In conformance with IAU conventions for the motion of the earth's equator
+and equinox <a href="#ref7">[ref 7]</a> GMST is linked directly to UT1
+through the equation
+
+</p><pre>	GMST (in seconds at UT1=0) = 24110.54841 + 8640184.812866 * T
+				   + 0.093104 * T^2 - 0.0000062 * T^3
+</pre>
+
+where <tt>T</tt> is in Julian centuries from 2000 Jan. 1 12h UT1
+
+<pre>	    T = d / 36525
+	    d = JD - 2451545.0
+</pre>
+
+It might seem strange that <a href="#UT1">UT1</a>, a solar time, is
+determined by measuring the earth's rotation with respect to distant
+celestial objects, and GMST, a sidereal time, is derived from it.  This
+oddity is mainly due our choice of solar time in defining the atomic time
+second.  Hence, small variations of the earth's rotation are more easily
+published as (UT1 - Atomic Time) differences.  In practice, of course,
+some form of sidereal time is involved in measuring UT1.
+
+<h3><a name="GAST">GAST - Greenwich Apparent Sidereal Time</a></h3>
+
+Greenwich Apparent Sidereal Time (GAST) is Greenwich Mean Sidereal Time
+(<a href="#GMST">GMST</a>) corrected for the shift in the position of the
+vernal equinox due to <a href="https://lweb.cfa.harvard.edu/~jzhao/earth_rot.html#nut">nutation</a>.  Nutation
+is the mathematically predictable change in the direction of the earth's
+axis of rotation due to changing external torques from the sun, moon and
+planets.  The smoothly varying part of the change in the earth's
+orientation (<a href="https://lweb.cfa.harvard.edu/~jzhao/earth_rot.html#prec">precession</a>) is already
+accounted for in GMST.  The right ascension component of nutation is
+called the "equation of the equinoxes" <a href="#ref9">[ref 9]</a>.
+
+<pre>	GAST = GMST + (equation of the equinoxes)
+</pre>
+
+<h3><a name="LMST">LMST - Local Mean Sidereal Time</a></h3>
+
+Local Mean Sidereal time is GMST plus the observer's longitude
+measured positive to the east of Greenwich.  This is the time commonly
+displayed on an observatory's sidereal clock.
+
+<pre>	LMST = GMST + (observer's east longitude)
+</pre>
+
+<h3><a name="LST">LST - Local Sidereal Time</a></h3>
+
+The definition of Local Sidereal Time given in the glossary of the
+Explanatory Supplement to the Astronomical Almanac is "the local hour
+angle of a catalog equinox."  This fits the common text book definition
+
+<pre>	Hour Angle = LST - Right Ascension
+</pre>
+
+where the right ascension can be specified in one of the catalog
+coordinate systems B1950 (FK4) or J2000 (FK5), for example.  In practice,
+LST is used more loosely to mean either LMST or "Local Apparent Sidereal
+Time" = GAST + (equation of the equinoxes).  The operational definition
+probably varies from one observatory to the next.
+
+<h2><a name="ref">References</a></h2>
+
+<p><a name="ref1">[1] Seidelmann, P.K., Guinot, B., Dogget, L.E., 1992,
+"Time", Chapter 2, p. 39, <em>Explanatory Supplement to the Astronomical
+Almanac</em>, Seidelmann, P.K., Ed., U. S. Naval Observatory, University
+Science Books, Mill Valley, CA.</a>
+
+</p><p><a name="ref2">[2] ibid., p. 86.
+
+</a></p><p><a name="ref3">[3] ibid., p. 47.
+
+</a></p><p><a name="ref4">[4] ibid., p. 43.
+
+</a></p><p><a name="ref5">[5] ibid., p. 46.
+
+</a></p><p><a name="ref6">[6] ibid., p. 85.
+
+</a></p><p><a name="ref6">[7] ibid., p. 50.
+
+</a></p><p><a name="ref8">[8] Archinal, B.A., 1992, "Terrestrial Coordinates and
+the Rotation of the Earth", Chapter 4, p. 253, <em>Explanatory Supplement
+to the Astronomical Almanac</em>, Seidelmann, P.K., Ed., U. S. Naval
+Observatory, University Science Books, Mill Valley, CA.</a>
+
+</p><p><a name="ref9">[9] Hohenkerk, C.Y., Yallop, B.D., Smith, C.A.,
+Sinclair, A.T., 1992, "Celestial Reference Syatems", Chapter 3, p. 116,
+<em>Explanatory Supplement to the Astronomical Almanac</em>, Seidelmann,
+P.K., Ed., U. S. Naval Observatory, University Science Books, Mill Valley,
+CA.</a>
+
+</p><p>Last updated January, 30, 1996, Rick Fisher (NRAO).</p>
+<p></p><address>rfisher@nrao.edu</address><p></p>
+<p></p><address><a href="http://www.cv.nrao.edu/~rfisher">Rick Fisher Home Site</a>
+<p></p>
+
+
+</address></body></html>

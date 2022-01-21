@@ -117,7 +117,7 @@ while ~feof(file)
     sat_names = sat_names(~cellfun('isempty',sat_names));
     sat_PRN = zeros(num_sat,1);
     %store epoch time. CONVERT TO GPST and more
-    data{epoch,1} = toGPST(year+2000,month,day,hour,minute,second);
+    data{epoch,1} = toGPST2(year+2000,month,day,hour,minute,second);
     % store observables for each satellite
     epoch_data = zeros(num_sat,obs.num_typeobs+6);
     epoch_data(:,1) = sat_PRN;

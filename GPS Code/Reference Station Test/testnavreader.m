@@ -88,7 +88,7 @@ while line~=-1      % do until end of file is reach where fgets returns -1
         second = str2num(line(22:23)); %Epoch Second
         
         % convert the Epoch Year,Month, Day, Hour, Minute and Second to GPST
-        data(i_epoch,2) = toGPST(year+2000,month,day,hour,minute,second);
+        data(i_epoch,2) = toGPST2(year+2000,month,day,hour,minute,second);
         %data(i_epoch,2) = toGPST(year+2000,month,day,hour,minute,second);
         data(i_epoch,3) = str2num(line(24:42)); %SV Clock Bias
         data(i_epoch,4) = str2num(line(43:61)); %SV Clock Drift
