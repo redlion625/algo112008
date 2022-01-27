@@ -24,7 +24,7 @@ if doy1<60
     end
     leap1=y1+y2leap;
 else
-    dToFeb28=435-doy;
+    dToFeb28=435-doy1;
     if mod(y1+1,4)==0
         y2leap=0;
     else

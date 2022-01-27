@@ -10,7 +10,7 @@ function [XYZ,v,DOP] = pointPos(L_PR,Xs,Ys,Zs,dTsv,xapprox,yapprox,zapprox)
 %   v - n x 1 residuals for each pseudorange
 %   DOP - 4 x 1 dilution of precision (LS error) of x,y,z and dTr
 
-% Notes: DOP not scaled by a posteriori  factor
+% Notes: DOP not scaled by a posteriori factor
 
 c = 2.99792458e8;
 
@@ -85,7 +85,7 @@ while(count < 40)
     thresh = [0.01; 0.01; 0.01; 1e-4]; %Determining the threshold at which the least squares loop with break
     count = count + 1; %Keeping track of how many iterations the loop makes
     if(all(abs(deltax) < thresh)) %If the delta values are less than the prescribed threshold values, the loop will break
-        fprintf("Solution Converged");
+        fprintf("Solution converged after "+num2str(count)+" iterations");
        % resultcheck(i) = count;
         Final = xhat; %Storing the least squares estimates of the X, Y, and Z components of the receiver's position and the receiver clock offset
         v = A*deltax - mis; %Calculating the residuals
@@ -93,6 +93,9 @@ while(count < 40)
         aposteriori = ((v')*v)/(n - 4); %Determining the a-posteriori variance factor
         %             Final(i,2) = aposteriori*Inverse;
         break;
+    elseif count==39
+        fprintf("Solution did not converge")
+        XYZ=NaN(3,1);
     end
 end
 XYZ=Final(1:3); %only point position returned, receiver offset discarded
