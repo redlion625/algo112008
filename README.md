@@ -7,7 +7,7 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">Best-README-Template</h3>
+  <h3 align="center">Sub-metre Positional Accuracy on a Smartphone</h3>
 
   <p align="center">
     An awesome README template to jumpstart your projects!
@@ -33,7 +33,7 @@
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#workflow">Workflow</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="#team">Team</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
@@ -66,9 +66,9 @@ Instructions on how to use the software locally
 ### Prerequisites
 
 All the software needed to run the project
-* matlab
-* python (in the future)
-* google earth (or forcefully open a browers if given permission)
+* Matlab
+* Python (in the future)
+* Google Earth (or forcefully open a browers if given permission)
 
 ### Installation
 
@@ -145,16 +145,16 @@ The team's work software development centres around estalishing tasks in the [op
 
 
 
-<!-- CONTACT -->
-## Contact
+<!-- Team -->
+## Team
 
-Jared Yen - [personal website](https://twitter.com/your_username) - email@example.com
+Jared Yen - [yen-jared-216556748](https://github.com/yen-jared-216556748)
 
-Melvin Gagarao - [personal website](https://twitter.com/your_username) - email@example.com
+Melvin Gagarao - [gagarao-melvin-216469637](https://github.com/gagarao-melvin-216469637)
 
-Nathan Stachow - [personal website](https://twitter.com/your_username) - email@example.com
+Nathan Stachow - [redlion625](https://github.com/redlion625)
 
-Ryan Nguyen - [personal website](https://twitter.com/your_username) - email@example.com
+Ryan Nguyen - [snudbud](https://github.com//snudbud)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
