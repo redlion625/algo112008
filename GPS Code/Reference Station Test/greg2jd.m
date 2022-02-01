@@ -5,6 +5,7 @@ function jd = greg2jd(y,m,d,hh,mm,ss)
 
 % Fliegel and Van Flandern algorithm for converting
 % Gregorian calendar date to julian day number jd
+
 %SoD=hh*3600+mm*60+ss
 %jd=(1461*(y+4800+(m-14)/12))/4+(367*(m-2-12*((m-14)/12)))/12 ...
 %    -(3*((y+4900+(m-14)/12)/100))/4+d-32075;%+SoD/86400;

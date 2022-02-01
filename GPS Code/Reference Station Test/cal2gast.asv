@@ -1,0 +1,21 @@
+function gast = utc2gast(y,m,d,hh,mm,ss)
+% Given:
+%     y,md,hh,mm,ss in UTC 
+%     DUT1 of date (UT1-UTC)
+% Returned:
+    
+utc=greg2mjd(y,m,d,hh,mm,ss);
+uta = Const.DJM0;
+% DUT1 = deltaUT1(utc);
+DUT1 = -0.182695;
+utb=utc+DUT1/Const.DAYSEC;
+
+tta=Const.DJM0;
+ttb=utc+(Const.TAIUTC+Const.TTMTAI)/Const.DAYSEC;
+
+gast = gst06a(uta,utb,tta,ttb);
+
+
+
+
+
