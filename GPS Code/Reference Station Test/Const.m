@@ -85,5 +85,14 @@ classdef Const
         % Schwarzschild radius of the Sun =au 
         % = 2 * 1.32712440041e20 / =2.99792458e8^2 / 1.49597870700e11 
         SRS =1.97412574336e-8
+        
+        % radius of earth equator in meters
+        AE = 6378136
+        
+        % Gravitational constant in m^3 / s^2
+        MU = 398600.44e9
+        
+        % 2nd Zonal coefficient of spherical harmonic expansion
+        C20 = -1082.63e-6
     end
 end

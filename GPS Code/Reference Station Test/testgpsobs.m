@@ -107,7 +107,9 @@ while ~feof(file)
     hour = str2num(temp{5}); %Epoch Hour
     minute = str2num(temp{6}); %Epoch Minute
     second = str2num(temp{7}); %Epoch Second
+    
     flag = str2num(temp{8}); %Epoch Flag
+    
     num_sat = str2num(curr_line(34:35)); %Number of measurements in epoch
     curr_line = fgetl(file);
     sat_names = curr_line(:,1:3); % Sat names
