@@ -31,7 +31,7 @@ classdef Const
         TURNAS =1296000.0
         
         % Milliarcseconds to radians 
-        %DMAS2R =DAS2R/1e3
+        DMAS2R = 4.848136811095359935899141e-9
         
         % Length of tropical year B1900 =days 
         DTY =365.242198781
@@ -56,6 +56,9 @@ classdef Const
         
         % Reference epoch =J2000.0, Modified Julian Date 
         DJM00 =51544.5
+        
+        % Reference epoch =GPST, Jan. 6, 1980 0h
+        DJGPS =2444244.5
         
         % 1977 Jan 1.0 as MJD 
         DJM77 =43144.0
@@ -90,9 +93,13 @@ classdef Const
         AE = 6378136
         
         % Gravitational constant in m^3 / s^2
-        MU = 398600.44e9
+        MU = 398600.4418e9
         
         % 2nd Zonal coefficient of spherical harmonic expansion
-        C20 = -1082.63e-6
+        C20 = -1082.62575e-6
+        
+        % earth rotation rate in rad/s
+        OMEGAE = 0.72921151467e-4
+        
     end
 end

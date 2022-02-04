@@ -45,4 +45,3 @@ h = r - en;
 wgs(1) = p*180/pi;
 wgs(2) = atan2(y, x)*180/pi;
 wgs(3) = h;
-
