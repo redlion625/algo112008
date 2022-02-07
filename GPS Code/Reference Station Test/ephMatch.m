@@ -1,5 +1,5 @@
 function minIndex = ephMatch(satnumobs,tobs,satnumnav,tnav)
-% ephMatch
+% ephMatch(satnumobs,tobs,satnumnav,tnav)
 % Given:
 %     1 x 1 double        satnumobs       PRN or satellite number of
 %                                         observation 
@@ -35,6 +35,7 @@ end
 
 % Initialize minimum time difference
 minDeltaT = abs(tobs-timeMatch(1));
+minIndex = indexMatch(1);
 
 for i = 2:numel(indexMatch)
     

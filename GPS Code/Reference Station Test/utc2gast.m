@@ -8,6 +8,7 @@ function gast = utc2gast(y,m,d,hh,mm,ss)
 utc=greg2mjd(y,m,d,hh,mm,ss);
 uta = Const.DJM0;
 % DUT1 = deltaUT1(utc);
+addpath(genpath('lib'));
 [DUT1,DUT1err] = extractDUT1(y,m,d);
 utb=utc+DUT1/Const.DAYSEC;
 

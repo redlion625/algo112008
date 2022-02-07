@@ -1,5 +1,5 @@
 function ts = emissionTime(R,tr,te,a0,a1,a2)
-% emissionTime
+% emissionTime(R,tr,te,a0,a1,a2)
 % Given:
 %     R           Pseudorange
 %     tr          Time of receiver in seconds of some start epoch

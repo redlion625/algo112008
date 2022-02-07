@@ -1,5 +1,5 @@
 function dt = svClockOffset(t1,t0,a0,a1,a2)
-% svClockOffset
+% svClockOffset(t1,t0,a0,a1,a2)
 % Given:
 %     a0,a1,a2    2nd order SV clock offset polynomial terms from ephemeris
 %     t1          uncorrected transmission time

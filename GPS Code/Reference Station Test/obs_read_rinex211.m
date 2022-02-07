@@ -1,4 +1,5 @@
 function obs = obs_read_rinex211(filename)
+tic
 fclose('all');
 %filename = 'algo1180.21o'
 fid=fopen(filename);
@@ -13,7 +14,7 @@ while ~contains(line,'END OF HEADER')
     elseif contains(line,'Interval')
         obs.interval = num2str(strip(line(1:60)));
     elseif contains(line,'TIME OF FIRST OBS')
-        obs.date_obs = 
+        obs.date_obs = str2double(fixedWidth(line,[6 6 6]));
     end
     line = fgetl(fid);
 end
@@ -34,7 +35,7 @@ while ~feof(fid)
         ymdhms = str2double(linesplit(1:6));
         numsat = str2num(linesplit(8));
         
-        epoch{count,1} = cal2gps(ymdhms(1),ymdhms(2),...
+        epoch{count,1} = cal2gps(2000+ymdhms(1),ymdhms(2),...
             ymdhms(3),ymdhms(4),ymdhms(5),ymdhms(6));
         obsrec = NaN(numsat,10);
         linesplit = linesplit(9);
@@ -76,6 +77,7 @@ while ~feof(fid)
     
     obs.epochdata = epoch;
 end
+toc
 
 
 
