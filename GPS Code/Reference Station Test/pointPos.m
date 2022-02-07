@@ -10,7 +10,7 @@ function [XYZ,v,DOP] = pointPos(L_PR,Xs,Ys,Zs,dTsv,xapprox,yapprox,zapprox)
 %   v - n x 1 residuals for each pseudorange
 %   DOP - 4 x 1 dilution of precision (LS error) of x,y,z and dTr
 
-% Notes: DOP not scaled by a posteriori  factor
+% Notes: DOP not scaled by a posteriori factor
 
 c = 2.99792458e8;
 
@@ -38,8 +38,8 @@ PR=zeros(n,1);
 %Performing a nonlinear least squares adjustment to determine the least
 %squares estimates of the receiver x, y, z position and the receiver
 %clock offset
+A=zeros(n,4);
 while(count < 40)
-    clear PR A mis
     x0 = xcurrent;   y0 = ycurrent;   z0 = zcurrent;  dtr0 = dtrcurrent; %Setting the current estimates of the unknown parameters to the current least squares estimates of the parameters
     
     for j = 1:n %A for-loop to create the first design matrix
@@ -82,10 +82,10 @@ while(count < 40)
     zcurrent = xhat(3);
     dtrcurrent = xhat(4);
     %disp(j);
-    thresh = [0.01; 0.01; 0.01; 1e-4]; %Determining the threshold at which the least squares loop with break
+    thresh = [0.001; 0.001; 0.01; 1e-4]; %Determining the threshold at which the least squares loop with break
     count = count + 1; %Keeping track of how many iterations the loop makes
     if(all(abs(deltax) < thresh)) %If the delta values are less than the prescribed threshold values, the loop will break
-        fprintf("Loop is broken");
+        fprintf("Solution converged after "+num2str(count)+" iterations \n");
        % resultcheck(i) = count;
         Final = xhat; %Storing the least squares estimates of the X, Y, and Z components of the receiver's position and the receiver clock offset
         v = A*deltax - mis; %Calculating the residuals
@@ -93,6 +93,14 @@ while(count < 40)
         aposteriori = ((v')*v)/(n - 4); %Determining the a-posteriori variance factor
         %             Final(i,2) = aposteriori*Inverse;
         break;
+    elseif count==39
+        warning("Solution did not converge")
+        Final = xhat; %Storing the least squares estimates of the X, Y, and Z components of the receiver's position and the receiver clock offset
+        v = A*deltax - mis; %Calculating the residuals
+        
+%         XYZ=NaN(3,1);
+%         v=NaN(n,1);
+%         DOP=NaN(size(Inverse));
     end
 end
 XYZ=Final(1:3); %only point position returned, receiver offset discarded

@@ -1,37 +1,83 @@
-function [Nav,navGLO] = Nav_reader(Navemerisfile);
+function [Nav] = Nav_reader(Navemerisfile)
 % Nav_reader reads RINEX v 3.04, mixed navigation file
-% Arrangement of Navigation data in the Nav struct
-%Nav.data(:,1) = 'PRN',
-%Nav.data(:,2) = 'GPST',
-%Nav.data(:,3) = 'SV Clock Bias',
-%Nav.data(:,4) = 'SV Clock Drift',
-%Nav.data(:,5) = 'SV Clock Drift Rate',
-%Nav.data(:,6) = 'IODE',
-%Nav.data(:,7) = 'Crs',
-%Nav.data(:,8) = 'Delta n',
-%Nav.data(:,9) = 'Mo',
-%Nav.data(:,10) = 'Cuc',
-%Nav.data(:,11) = 'Eccentricity',
-%Nav.data(:,12) = 'Cus',
-%Nav.data(:,13) = 'Sqrt(a)',
-%Nav.data(:,14) = 'TOE',
-%Nav.data(:,15) = 'Cic',
-%Nav.data(:,16) = 'OMEGA',
-%Nav.data(:,17) = 'CIS',
-%Nav.data(:,18) = 'Io',
-%Nav.data(:,19) = 'Crc',
-%Nav.data(:,20) = 'Omega',
-%Nav.data(:,21) = 'OMEGA DOT',
-%Nav.data(:,22) = 'IDOT',
-%Nav.data(:,23) = 'L2 Channel Codes',
-%Nav.data(:,24) = 'GPS Week',
-%Nav.data(:,25) = 'L2 P Data Flag',
-%Nav.data(:,26) = 'SV Accuracy',
-%Nav.data(:,27) = 'SV Health',
-%Nav.data(:,28) = 'TGD',
-%Nav.data(:,29) = 'IODC',
-%Nav.data(:,30) = 'Transmission Time',
-%Nav.data(:,31) = 'Fit Interval'
+%
+% Arrangement of GPS Navigation array (Nav.data) 
+%
+%   j = line of data record in RINEX 3.04 file
+%         
+%   Column  Description
+% 
+% 	=====        
+%   j = 1
+% 	=====
+%         
+%   1       sat number (PRN)
+%   2       Time of clock in seconds since GPS reference epoch)
+%   3       SV clock bias
+%   4       SV clock drift
+%   5       SV clock drift rate
+%         
+% 	=====
+%   j = 2
+% 	=====
+%         
+%   6       Issue of data, ephemeris (IODE)
+% 	7       Crs in m
+% 	8       Delta in rad/sec
+% 	9       M0 in rad
+% 
+% 	=====
+% 	j = 3
+% 	=====
+% 
+% 	10      Time of ephemeris (Toe) in sec of GPS week
+% 	11      Cic in radians
+% 	12      OMEGA0 in radians
+% 	13      Cis in rad	
+% 
+% 	=====
+% 	j = 4
+% 	=====
+% 
+% 	14      Time of ephemeris (Toe) in sec of GPS week
+% 	15      Cic in radians
+% 	16      OMEGA0 in radians
+% 	17      Cis in rad
+% 
+% 	=====
+% 	j = 4
+% 	=====
+% 
+% 	18      i0 in rad
+% 	19      Crc in m
+% 	20      omega in rad	
+% 	21      OMEGA DOT in rad/sec
+% 
+% 	=====
+% 	j = 5
+% 	=====
+% 
+% 	22      IDOT in rad/sec
+% 	23      codes on L2 channel
+% 	24      Continuous GPS week number, not mod(1024)
+% 	25      L2 P data flag
+% 
+% 	=====
+% 	j = 6
+% 	=====
+% 
+% 	26      SV accuracy in m as per GPS ICD 200H Section 20.3.3.3.1.3
+% 	27      sv health
+% 	28      TGD in sec
+% 	29      Issue of date, Clock (IODC)
+% 
+% 	=====
+% 	j = 7
+% 	=====
+% 
+% 	30      Transmission time of message in sec of GPS week
+% 	31      Fit Interval
+tic
 disp('------------------Begin reading navigation file---------------------');
 RI = 1;         % receiver indicator defined here for now, later pull out from header.
 C1=[]; L1=[]; D1=[]; S1=[]; P2=[]; L2=[]; D2=[];  S2=[];
@@ -70,15 +116,15 @@ while ~contains(line,'END OF HEADER')
         Nav.ionCorr=ionCorr;
     elseif ~isempty(strfind(line,'LEAP SECONDS'))
         temp = strsplit(line);
-        Nav.leap_sec = str2double(temp(2));
-    elseif contains(line,'BRD_SUM G   -')
-        Nav.numepochsGPS=str2num(line(50:58));
-    elseif contains(line,'BRD_SUM R   -')
-        Nav.numepochsGLO=str2num(line(50:58));
-    elseif contains(line,'BRD_SUM E   -')
-        Nav.numepochsGAL=str2num(line(50:58));
-    elseif contains(line,'BRD_SUM C   -')
-        Nav.numepochsBDS=str2num(line(50:58));
+        Nav.gpsutc = str2double(temp(2));
+%     elseif contains(line,'BRD_SUM G   -')
+%         Nav.numepochsGPS=str2num(line(50:58));
+%     elseif contains(line,'BRD_SUM R   -')
+%         Nav.numepochsGLO=str2num(line(50:58));
+%     elseif contains(line,'BRD_SUM E   -')
+%         Nav.numepochsGAL=str2num(line(50:58));
+%     elseif contains(line,'BRD_SUM C   -')
+%         Nav.numepochsBDS=str2num(line(50:58));
         %     elseif ~isempty(strfind(line,'ION ALPHA'))
         %         temp = strsplit(line);
         %         for j=1:4
@@ -106,16 +152,19 @@ Nav.tSysCorr=tSysCorr;
 line=fgets(fidobs); % get the first line of the body
 i_epoch = 0;        % index for measurement data epoch
 iGLO=0;
+
 i_obs = 0;          % index for every observation (SV and epoch)
 while line~=-1      % do until end of file is reach where fgets returns -1
     i_epoch = i_epoch +1;
     if(line(1) == 'G')
         
+
+        
         data(i_epoch,1) = str2num(line(2:3)); %str2num(line(1:3));
         %elseif(line(1) == '
         %data(i_epoch,1) = (line(1:3)); %PRN
         %data(i_epoch,1) = str2num(line(1:3)); %PRN
-        year = str2num(line(5:8)) - 2000; %Epoch Year
+        year = str2num(line(5:8)); %Epoch Year
         month = str2num(line(10:11)); %Epoch Month
         day = str2num(line(13:14)); %Epoch Day
         hour = str2num(line(16:17)); %Epoch Hour
@@ -123,7 +172,7 @@ while line~=-1      % do until end of file is reach where fgets returns -1
         second = str2num(line(22:23)); %Epoch Second
         
         % convert the Epoch Year,Month, Day, Hour, Minute and Second to GPST
-        data(i_epoch,2) = toGPST(year+2000,month,day,hour,minute,second);
+        data(i_epoch,2) = utc2gps(year,month,day,hour,minute,second);
         %data(i_epoch,2) = toGPST(year+2000,month,day,hour,minute,second);
         data(i_epoch,3) = str2num(line(24:42)); %SV Clock Bias
         data(i_epoch,4) = str2num(line(43:61)); %SV Clock Drift
@@ -150,18 +199,24 @@ while line~=-1      % do until end of file is reach where fgets returns -1
         
         % read line 1 of msg at epoch i
         temp=fixedWidth(line,[1 2 5 3 3 3 3 3 19 19 19]);
+        
         navGLO(iGLO).satnum=str2num(temp(2));
+        
         navGLO(iGLO).year=str2num(temp(3));
         navGLO(iGLO).month=str2num(temp(4));
         navGLO(iGLO).day=str2num(temp(5));
-        %navGLO(iGLO).glonass2utc=glonass2utc;
-
-        
         navGLO(iGLO).hr=str2num(temp(6));
         navGLO(iGLO).min=str2num(temp(7));
         navGLO(iGLO).sec=str2num(temp(8));
-        navGLO(iGLO).clkbias=str2num(temp(9));
-        navGLO(iGLO).freqbias=str2num(temp(10));
+        navGLO(iGLO).gpst = utc2gps(navGLO(iGLO).year, ...
+                                    navGLO(iGLO).month, ... 
+                                    navGLO(iGLO).day, ... 
+                                    navGLO(iGLO).hr, ...
+                                    navGLO(iGLO).min, ...
+                                    navGLO(iGLO).sec);
+        
+        navGLO(iGLO).mTauN=str2num(temp(9));
+        navGLO(iGLO).GammaN=str2num(temp(10));
         navGLO(iGLO).msgframetime=str2num(temp(11));
         
         % read line 2
@@ -175,6 +230,7 @@ while line~=-1      % do until end of file is reach where fgets returns -1
         % read line 3
         line=fgetl(fidobs);
         temp=fixedWidth(line,[23 19 19 19]);
+        
         navGLO(iGLO).ypos=str2num(temp(1))*1000;
         navGLO(iGLO).yvel=str2num(temp(2))*1000;
         navGLO(iGLO).yacc=str2num(temp(3))*1000;
@@ -183,10 +239,12 @@ while line~=-1      % do until end of file is reach where fgets returns -1
         % read line 4
         line=fgetl(fidobs);
         temp=fixedWidth(line,[23 19 19 19]);
+        
         navGLO(iGLO).zpos=str2num(temp(1))*1000;
         navGLO(iGLO).zvel=str2num(temp(2))*1000;
         navGLO(iGLO).zacc=str2num(temp(3))*1000;
         navGLO(iGLO).ageop=str2num(temp(4));
+        
         line=fgets(fidobs);
     end
     if(line(1) ~= 'G'&&line(1)~='R')
@@ -228,10 +286,12 @@ end
 %       line = fgets(fidobs);
 %     end %if statement
 %end %while line1~=-1
-Nav.glonav=navGLO;
+Nav.glonav = struct2table(navGLO);
 Nav.data = data;
+disp("Number of GLONASS records: " + num2str(iGLO));
 disp('----------------Completed reading nav file-------------------');
 fclose('all');
+toc
 %%%%%%%%% end Nav_reader.m %%%%%%%%%
 
 %Navigationtime = Nav.data.data(:,2);

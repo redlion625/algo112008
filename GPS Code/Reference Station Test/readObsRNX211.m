@@ -35,7 +35,7 @@ while ~contains(line,'END OF HEADER')
     line=fgetl(fid);
 end
 %% read observation records
-numEpoch=86400/obs.interval;
+%numEpoch=86400/obs.interval;
 data=cell(numEpoch,2);
 epoch=1;
 while ~feof(fid)
@@ -51,7 +51,7 @@ while ~feof(fid)
         flag=str2num(temp(7));
         satnum=str2num(temp(8));
         
-        data{epoch,1} = toGPST(year+2000,month,day,hour,minute,second);
+        data{epoch,1} = cal2gps(year,month,day,hour,minute,second);
         epoch_data=zeros(satnum,obs.obsPerEpoch+2);
         sat=strtrim(temp(9));
         constellation=zeros(satnum,1);

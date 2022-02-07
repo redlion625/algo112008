@@ -1,3 +1,5 @@
+
+function obs = testgpsobs(filepath)%obs_read(filepath)
 %% Observation File Reader
 %Updated notes: The first column of the observation file is the
 %constellation (GPS = 1, GLONASS = 2, GALILEO = 3), the second column is
@@ -24,27 +26,27 @@
 %           information; PRN-L1-C1 so on. The observables are ordered per
 %           the obs file layout
 
-% Notes: 
+% Notes:
 %   observation entries with spaces are missing values and should be ignored
 
-function obs = testgpsobs(filepath)%obs_read(filepath)
+
+tic
 %D:\Third Year\ESSE 3670\Project 3\Data Downloaded\datasets to try with\algo\algo112008\ALGO0010.08O
 file = fopen(filepath);   %39ea118x.21o  %Pixel4_GnssLog.21o  %("Pixel4XLModded_GnssLog.20o");  %fopen("ALGO0010.08O");
 disp('------------------Begin reading obs file---------------------');
 %read constant parameters
-curr_line = fgetl(file); %fget1 %fopen %fgetl
+%curr_line = fgetl(file); %fget1 %fopen %fgetl
 obs.rec_ID = [];
 obs.pos_xyz = [];
 obs.ant_delta_HEN = [];
 obs.num_typeobs = [];
-obs.type_obs = [];
 obs.epochdata_headers={'GPST','GPS obs', 'GLO obs'};
-sysCount=0;
 %obsTypes=struct;
 %obsTypes=table;
 obsTypes=table('Size',[1 2],'VariableTypes',{'string','cellstr'},'VariableNames',{'sys','obsNames'});
-
+curr_line="";
 while isempty(strfind(curr_line,'END OF HEADER'))
+    curr_line= fgetl(file);
     if ~isempty(strfind(curr_line,'REC # / TYPE / VERS'))
         temp = strsplit(curr_line);
         obs.rec_ID = temp(1);
@@ -63,18 +65,22 @@ while isempty(strfind(curr_line,'END OF HEADER'))
         obs.num_typeobs = str2double(temp(2));
         obs.type_obs = temp(3:obs.num_typeobs+2);
     elseif contains(curr_line,'SYS / # / OBS TYPES')
+        % Records the constellation systems observed, the number of
+        % observations and observation types of each constellation
+        
         numSys=1;
-        while contains(curr_line,'SYS / # / OBS TYPES')
+        
+        while contains(curr_line,'SYS / # / OBS TYPES') % assumes consecutive entries
             temp=fixedWidth(curr_line,[1 5 4 4 4 4 4 4 4 4]);
             numObs=str2num(temp(2));
             obsTypes{numSys,:}={strip(temp(1)), cellstr(strip(temp(3:2+numObs)))};
             curr_line = fgetl(file);
             numSys=numSys+1;
         end
-        %curr_line = fgetl(file); %fgetl or fget1
     end
-    curr_line= fgetl(file);
+    
 end
+obs.type_obs = obsTypes;
 %% Helper function
 %  Standardizes length of data lines to dicern which observables are missing
     function lineOut = fillWhite(line)
@@ -91,23 +97,29 @@ obs.data_headers = {'Pseudorange', 'Phase', 'Doppler', 'Raw Signal Strength'};  
 obs.struct_headers = {'Pseudorange', 'Phase', 'Doppler', 'Raw Signal Strength'}; %{'Epoch Time','Data','Rec. ECF X','Rec. ECF Y','Rec. ECF Z','Rec. Clock Error','LS Iterations','Residuals','Cov. Matrix'};
 data = cell(2880,3); % using 2 obs/min * 60 mins/hr 24hr/day
 
-%gloobs=table('Size',[1 ])
+gloobsRecord=table('Size',[1 5],'VariableTypes',["double" "double" "double" "double" "double"]);
 
 epoch = 1;
 n = 1;
 curr_line = fgetl(file);
+gloobsCount=0;
+gloobsTotal = 0;
+rowGLO = find(obsTypes.sys == "R");
+gloobsNames = obsTypes.obsNames{rowGLO};
 while ~feof(file)
     % iterate per epoch
     % first line of data
     v = n;
     temp = strsplit(curr_line);
-    year = str2num(temp{2})-2000; %Epoch Year
+    year = str2num(temp{2}); %Epoch Year
     month = str2num(temp{3}); %Epoch Month
     day = str2num(temp{4}); %Epoch Day
     hour = str2num(temp{5}); %Epoch Hour
     minute = str2num(temp{6}); %Epoch Minute
     second = str2num(temp{7}); %Epoch Second
+    
     flag = str2num(temp{8}); %Epoch Flag
+    
     num_sat = str2num(curr_line(34:35)); %Number of measurements in epoch
     curr_line = fgetl(file);
     sat_names = curr_line(:,1:3); % Sat names
@@ -117,17 +129,21 @@ while ~feof(file)
     sat_names = sat_names(~cellfun('isempty',sat_names));
     sat_PRN = zeros(num_sat,1);
     %store epoch time. CONVERT TO GPST and more
-    data{epoch,1} = toGPST(year+2000,month,day,hour,minute,second);
+    data{epoch,1} = cal2gps(year,month,day,hour,minute,second);
     % store observables for each satellite
     epoch_data = zeros(num_sat,obs.num_typeobs+6);
     epoch_data(:,1) = sat_PRN;
     line = curr_line;
-    gloobsCount=0;
-    rowGLO=find(obsTypes.sys=="R");
-    obsNames=cat(2,{'satNum'},obsTypes.obsNames{rowGLO});
-    varTypes=strings([1 numel(obsNames)]);
-    varTypes(:,:)="double";
-    gloobsRecord=table('Size',[1 5],'VariableTypes',varTypes,'VariableNames',obsNames);
+    
+    % GLONASS
+    gloobsTotal = gloobsTotal + gloobsCount;
+    gloobsCount = 0;
+    
+    gloobsEpoch = zeros(1,5);
+    
+    %varTypes = strings([1 numel(gloobsNames)]);
+    % varTypes(:,:) = "double";
+    %gloobsRecord=table('Size',[1 5],'VariableTypes',varTypes,'VariableNames',obsNames);
     for j = 1:num_sat
         %str = 'G';
         %expression = line(1);
@@ -224,15 +240,32 @@ while ~feof(file)
             line = fgetl(file);
             % To be completed
         elseif line(1) == 'R'
+            
             gloobsCount=gloobsCount+1;
-            temp=fixedWidth(line,[1 2 16*ones(1,numel(obsNames)-1)]);
-%             for ind = 3:numel(temp)
-%                 if contains(strip(temp(ind))," ")
-%                     temp(ind)=""; % when converting string array to 
+            temp=fixedWidth(line,[1 2 16*ones(1,numel(gloobsNames))]);
+            
+            % array implementation
+            gloobsEpoch(gloobsCount,:) = str2double(temp(2:end));
+            %struct implementation
+            %
+%             for i = 1:numel(gloobsNames)
+%                 gloobsEpoch(gloobsCount).(gloobsNames{i})=str2num(temp(i+2));
+%                 
+%                 % considers observations with spaces as empty then fills with NaN
+%                 if isempty(gloobsEpoch(gloobsCount).(gloobsNames{i}))
+%                     gloobsEpoch(gloobsCount).(gloobsNames{i})=NaN;
 %                 end
+%                 
 %             end
-            %C=mat2cell(str2double(temp(2:end)),1,[ones(1,numel(obsNames))]);
-            gloobsRecord{gloobsCount,:}=str2double(temp(2:end)); 
+            % Table implementation
+%             
+%                         for ind = 3:numel(temp)
+%                             if contains(strip(temp(ind))," ")
+%                                 temp(ind)=""; % when converting string array to
+%                             end
+%                         end
+            %C=mat2cell(str2double(temp(2:end)),1,[ones(1,numel(gloobsNames))]);
+            %gloobsRecord{gloobsCount,:}=str2double(temp(2:end));
             % considers observations with spaces as missing data and returns
             % NaN
             line = fgetl(file);
@@ -334,11 +367,13 @@ while ~feof(file)
     
     curr_line = line;
     data{epoch,2} = epoch_data;
-    data{epoch,3}=gloobsRecord;
+    data{epoch,3}=gloobsEpoch;
     epoch = epoch +1;
     n = n + 1;
+    clear gloobsEpoch
 end
 obs.epochdata = data;
 disp('----------------Completed reading obs file-------------------');
 fclose(file);
+toc
 end

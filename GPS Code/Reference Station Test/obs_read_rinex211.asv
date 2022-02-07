@@ -1,0 +1,63 @@
+function obs_read_rinex211(filename)
+fclose('all');
+%filename = 'algo1180.21o'
+fid=fopen(filename);
+line=fgetl(fid);
+obs=struct();
+obs.obstypes = [];
+obs.interval = [];
+while ~contains(line,'END OF HEADER')
+    if contains(line,'TYPES OF OBS')
+        linesplit = fixedWidth(line,6*ones(1,9));
+        obs.obstypes = linesplit(linesplit~="");
+    elseif contains(line,'Interval')
+        obs.interval = num2str(strip(line(1:60)));
+    end
+    line = fgetl(fid);
+end
+if isempty(obs.interval)
+    epoch = cell(1,2);
+else
+    epoch = cell(Const.DAYSEC/obs.interval,2);
+end
+
+line = fgetl(fid);
+pat = lettersPattern;
+count = 0;
+% while end of file not found
+while ~feof(fid)
+    if contains(line,pat)
+        count = count + 1;
+        linesplit = fixedWidth(line,[3*ones(1,5) 11 3 3 36]);
+        ymdhms = str2double(linesplit(1:6));
+        numsat = str2num(linesplit(8));
+        
+        epoch{count,1} = cal2gps(ymdhms(1),ymdhms(2),...
+            ymdhms(3),ymdhms(4),ymdhms(5),ymdhms(6));
+        obsrec = NaN(numsat,8);
+        linesplit = linesplit(9);
+        if numsat > 12
+            line = fgetl(fid);
+            linesplit = strcat(linesplit,strip(line));
+        end
+        widths = zeros(1,numsat*2);
+        widths(1:2:end) = 1;
+        widths(2:2:end) = 2;
+        linesplit = fixedWidth(linesplit,widths);
+        sys = linesplit(1:2:end);
+        for i = 1:numsat
+            obsrec(i,1) = const2num(sys(i));
+        end
+        obsrec(:,2) = str2double(linesplit(2:2:end)');
+        
+        
+        line = fgetl(fid);
+    else
+        line = fgetl(fid);
+        %error('what is this file?');
+    end
+    
+end
+
+
+

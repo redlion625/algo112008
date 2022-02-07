@@ -1,0 +1,2 @@
+function TT = UTC2TT(UTC)
+TT=UTC+(Const.TAIUTC+32.184)/Const.DAYSEC;

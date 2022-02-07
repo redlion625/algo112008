@@ -4,17 +4,17 @@
 <br />
 <div align="center">
   <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="images/Highway.png" alt="Logo">
   </a>
 
-  <h3 align="center">Best-README-Template</h3>
+  <h2 align="center"><b>Sub-metre Positional Accuracy on a Smartphone</b></h2>
 
   <p align="center">
-    An awesome README template to jumpstart your projects!
-    <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>View the Code »</strong></a>
+    York University: ENG 4000 Capstone Project
   </p>
 </div>
+
+
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -33,17 +33,16 @@
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#workflow">Workflow</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="#team">Team</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
+<p>&nbsp;</p>
 
 
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
 
 Description...
 Scope...
@@ -61,14 +60,14 @@ Jot Notes
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Instructions on how to use the software locally
+Instructions on how to use the software locally...
 
 ### Prerequisites
 
 All the software needed to run the project
-* matlab
-* python (in the future)
-* google earth (or forcefully open a browers if given permission)
+* Matlab
+* Python (in the future)
+* Google Earth (or open a brower with user permission)
 
 ### Installation
 
@@ -91,8 +90,6 @@ _Below is an example of how you can instruct your audience on installing and set
 ## Usage
 
 Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -136,21 +133,25 @@ See the [open issues](https://github.com/redlion625/algo112008/issues) for a ful
 
 The team's work software development centres around estalishing tasks in the [open issues](https://github.com/redlion625/algo112008/issues).
 
-1. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-2. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+1. Create your Feature Branch (`git checkout -b feature/improvement`)
+2. Commit your Changes (`git commit -m 'Add some improvement'`)
+4. Push to the Branch (`git push origin feature/improvement`)
 4. Open a Pull Request
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
 
-<!-- CONTACT -->
-## Contact
+<!-- Team -->
+## Team
 
-Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com
+Jared Yen - [yen-jared-216556748](https://github.com/yen-jared-216556748)
 
-Project Link: [https://github.com/your_username/repo_name](https://github.com/your_username/repo_name)
+Melvin Gagarao - [gagarao-melvin-216469637](https://github.com/gagarao-melvin-216469637)
+
+Nathan Stachow - [redlion625](https://github.com/redlion625)
+
+Ryan Nguyen - [snudbud](https://github.com//snudbud)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -159,12 +160,9 @@ Project Link: [https://github.com/your_username/repo_name](https://github.com/yo
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
-
 ### York University Educators
-* **Dr. Sunil Bisnath** Department of Earth and Space Science and Engineering
-* **Garrett Seepersad** friendly guy
-* Other TAs...
+* **Dr. Sunil Bisnath** - Department of Earth and Space Science and Engineering
+* **Garrett Seepersad** - Friendly TA
 
 ### Digital References
 * [README Template](https://github.com/othneildrew/Best-README-Template)
@@ -178,10 +176,6 @@ Use this space to list resources you find helpful and would like to give credit 
 * [ION PPP Advantages and Drawbacks](https://www.ion.org/publications/abstract.cfm?articleID=10957#:~:text=Given%20that%20PPP%20is%20not,observation%20times%20for%20static%20positioning)
 * [Trimble RTX FAQ](https://positioningservices.trimble.com/wp-content/uploads/2019/02/Trimble-RTX-FAQ-2020-Brochure.pdf)
 * [NASA Archive](https://cddis.nasa.gov/Data_and_Derived_Products/GNSS/GNSS_data_and_product_archive.html)
+* [CVS to KML](https://www.convertcsv.com/csv-to-kml.htm)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[product-screenshot]: images/screenshot.png
