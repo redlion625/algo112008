@@ -9,6 +9,8 @@ classdef Const
         % update for different leap second period
         TAIUTC=37
         
+        GPSUTC = 18
+        
         % 2Pi 
         D2PI =6.283185307179586476925287
         
@@ -97,6 +99,7 @@ classdef Const
         
         % 2nd Zonal coefficient of spherical harmonic expansion
         C20 = -1082.62575e-6
+        J20 = 1082.62575e-6
         
         % earth rotation rate in rad/s
         OMEGAE = 0.72921151467e-4
