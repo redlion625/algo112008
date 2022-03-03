@@ -95,14 +95,18 @@ classdef Const
         AE = 6378136
         
         % Gravitational constant in m^3 / s^2
-        MU = 398600.4418e9
+        MU = 398600441.8e6
         
         % 2nd Zonal coefficient of spherical harmonic expansion
         C20 = -1082.62575e-6
         J20 = 1082.62575e-6
         
         % earth rotation rate in rad/s
-        OMEGAE = 0.72921151467e-4
+        OMEGAE = 7.2921151467e-5
+        OMEGAE_GLO=7.292115E-5
+        AE_GLO=6378136.0
+        J20_GLO=1.0826257E-3
+        MU_GLO=3.9860044E14
         
     end
 end

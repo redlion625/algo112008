@@ -1,4 +1,4 @@
-function gmst = gmstGLO(y,m,d,hh,mm,ss)
+function gmst = gmstGLO(jd0)
 % gmstGLO(y,m,d,hh,mm,ss)
 % Given:
 %     y, m, d, hh, mm, ss
@@ -8,7 +8,6 @@ function gmst = gmstGLO(y,m,d,hh,mm,ss)
 % 
 % Reference:
 %     GLONASS CDMA ICD (2016)
-jd0 = greg2jd(y,m,d,hh,mm,ss);
 
 tdelta = (jd0-Const.DJ00)/Const.DJC;
 gmst = eraGLO(jd0) + 0.0000000703270726          + 0.0223603658710194*tdelta + ...

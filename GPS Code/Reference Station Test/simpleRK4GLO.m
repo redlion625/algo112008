@@ -40,10 +40,9 @@ o2 = Vz0 + 0.5*h*L1;
 xstep = x0 + 0.5*h*m1;
 ystep = y0 + 0.5*h*n1;
 zstep = z0 + 0.5*h*o1;
-vxstep = Vx0 + 0.5*h*J1;
-vystep = Vy0 + 0.5*h*K1;
-J2 = getAx(xstep, ystep, zstep, vystep, AxLS);
-K2 = getAy(xstep, ystep, zstep, vxstep, AyLS);
+
+J2 = getAx(xstep, ystep, zstep, m2, AxLS);
+K2 = getAy(xstep, ystep, zstep, n2, AyLS);
 L2 = getAz(xstep, ystep, zstep, AzLS);
 
 m3 = Vx0 + 0.5*h*J2;
@@ -53,10 +52,9 @@ o3 = Vz0 + 0.5*h*L2;
 xstep = x0 + 0.5*h*m2;
 ystep = y0 + 0.5*h*n2;
 zstep = z0 + 0.5*h*o2;
-vxstep = Vx0 + 0.5*h*J2;
-vystep = Vy0 + 0.5*h*K2;
-J3 = getAx(xstep, ystep, zstep, vystep, AxLS);
-K3 = getAy(xstep, ystep, zstep, vxstep, AyLS);
+
+J3 = getAx(xstep, ystep, zstep, m3, AxLS);
+K3 = getAy(xstep, ystep, zstep, n3, AyLS);
 L3 = getAz(xstep, ystep, zstep, AzLS);
 
 m4 = Vx0 + h*J3;
