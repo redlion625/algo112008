@@ -89,7 +89,7 @@ for i = 1:length(obs)
         %         index = I(P); %Saving the minimum matched index for current reference
         %         minInd == index;
         
-        % super secret test case
+
         %         if minInd ~= index
         %             error('aha');
         %         end
@@ -112,7 +112,7 @@ num_epoch = length(obs);
 
 for i = 1:num_epoch %Iterating through every epoch
     
-    obssize = size(obs{i,2}); %Determining the size of the submatrix attached to the epoch of observations
+    obssize = size(obs{i,2},1); %Determining the size of the submatrix attached to the epoch of observations
     clear elevationangle azimuth dTsv L
     remove = [];
     %if(i == 1)
@@ -142,7 +142,7 @@ for i = 1:num_epoch %Iterating through every epoch
                 Nav.data.satnum,...
                 Nav.data.sod);
             % (Nav.data.gpst(indexnav) - trec)/60
-            PR = obs{i,2}(j,3)-Const.CMPS*Nav.LS;
+            PR = obs{i,2}(j,3)-Const.CMPS*(Nav.LS-Nav.mTauC);
             % time of transmission
             
             te = Nav.data.sod(iNav);
@@ -150,10 +150,10 @@ for i = 1:num_epoch %Iterating through every epoch
             ti=trec-PR/c;
             
             dtsv=ti-te;
-            for 1:2
-                dtsv=dtsv+Nav.data.mTauN-Nav.data.GammaN*dtsv;
+            for s=1:2
+                dtsv=dtsv+Nav.data.mTauN(iNav)-Nav.data.GammaN(iNav)*dtsv;
             end
-            dtsv=-Nav.data.mTauN+Nav.data.GammaN*dtsv;
+            dtsv=-Nav.data.mTauN(iNav)+Nav.data.GammaN(iNav)*dtsv;
             
             ti=ti-dtsv;
             

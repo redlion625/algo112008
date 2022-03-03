@@ -1,0 +1,2 @@
+PR = PR(GLO)-c*((UTC-GPS) +/-(?) mTauC)
+- GLONASS nav time in GLO time
