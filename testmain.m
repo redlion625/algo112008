@@ -6,8 +6,8 @@ format long g
 
 
 %Reading the observation and navigation data into the program
-Nav_data = testnavreader("D:\Third Year\ESSE 3670\Project 3\Data Downloaded\datasets to try with\algo\algo112008\brdm1180.21p");
-Obs_data = testgpsobs("D:\Third Year\ESSE 3670\Project 3\Data Downloaded\datasets to try with\algo\algo112008\Pixel4_GnssLog.21o");  %Pixel4_GnssLog.21o %39ea118x.21o
+Nav_data = Nav_readergps("D:\Third Year\ESSE 3670\Project 3\Data Downloaded\datasets to try with\algo\algo112008\brdm0050.21p");  %brdm0840.21p  %brdm0840.21p  %brdm2260.20p  %brdm1180.21p  %brdm1560.20p  %brdm1180.21p"); %brdm1360.20p
+Obs_data = Obs_readergps("D:\Third Year\ESSE 3670\Project 3\Data Downloaded\datasets to try with\algo\algo112008\0105Mi8_GnssLog.21o"); %SamsungS20Ultra_GnssLog0325.21o   %Pixel4XL_GnssLog0604.20o  %Mi8_GnssLog.20o  % %SamsungS20Ultra_GnssLog.21o  %Pixel4_GnssLog.21o     %Pixel4_GnssL.20o  Pixel4_GnssLog.21o"); %Pixel4_GnssLog.20o" %Pixel4_GnssLog.21o %39ea118x.21o
 
 
 %% Match observation and navgitation data
@@ -15,10 +15,11 @@ Observations = Obs_data.data;
 obssize = size(Observations{1,2}); %Determining the number of observations
 navsize = size(Nav_data.data); %Determining the number of navigation
 
+totalnum = 0;
 %Iterating through the observations vector
 for i = 1:length(Observations)
     obssize = size(Observations{i,2}); %Entering the current submatrix for the current observation epoch
-
+    totalnum = totalnum + 1; 
     for j = 1:obssize(1) %Iterating through the number of satellites at each epoch 
         timediff = [];
         I = [];
@@ -40,25 +41,54 @@ end
 %% Loop through each satellite
 f1 = 1575.42e6; %L1
 f2 = 1176.45e6; %L5
-gravitationalparameter = 3.986005e14; %WGS84 value of the Earth's gravitational constant for GPS
+GPSA = Nav_data.GPSA; 
+GPSB = Nav_data.GPSB;
+gamma = ((f1/f2)^2);
+gravitationalparameter = 3.986004418e14; %3.986005e14; %WGS84 value of the Earth's gravitational constant for GPS
 earthrotation = 7.2921151467e-5; %WGS84 value of the Earth's rotation rate
 c = 2.99792458e8; %Speed of light
 for i = 1:length(Observations) %Iterating through the number of observations
     obssize = size(Observations{i,2}); %Determining the size of the submatrix attached to the epoch of observations
     clear elevationangle azimuth dTsv
      remove = [];
-     if(i == 1749)
+     if(i == Obs_data.sum - 1)
          break;
      else
          
     for j = 1:obssize(1) %Iterating through the submatrix attached to the observation epoch
         P2 = Observations{i,2}(j,7); %P2 code
         P1 = Observations{i,2}(j,3); %P1 code
-%         if(P2 == 0)
-            Pseudorange(i,j)= P1; 
-%         else
-%             Pseudorange(i,j) = ((f1^2)/((f1^2) - (f2^2)))*(P1) - ((f2^2)/((f1^2) - (f2^2)))*(P2); % ((f1^2)*P1 - (f2^2)*P2)/(f1^2-f2^2);
-%         end        
+        if(P1 ~= 0)
+            if(P2 ~= 0)
+                Pseudorange(i,j) = ((f1^2)/((f1^2) - (f2^2)))*(P1) - ((f2^2)/((f1^2) - (f2^2)))*(P2); % ((f1^2)*P1 - (f2^2)*P2)/(f1^2-f2^2);
+                Pseudoranget(i,j) = (P2 - gamma*P1)/(1 - gamma);
+                Pseudorangeagain(i,j) = ((f1^2)*P1 - (f2^2)*P2)/(f1^2-f2^2);
+                diffpseudo(i,j) = P1 - Pseudorange(i,j); 
+                testpseudo(i,j) = Pseudorange(i,j) - Pseudoranget(i,j);
+                uo = 1;
+                indL1 = Observations{i,2}(j,6);
+                indL2 = Observations{i,2}(j,10);
+                if(indL1 > indL2)
+                    indexL = Observations{i,2}(j,6); %indexL(i,j)
+                    bL = 293;
+                else
+                    indexL = Observations{i,2}(j,10); %indexL(i,j)
+                    bL = 29.3;
+                end
+            else
+                Pseudorange(i,j)= P1; 
+                indexL = Observations{i,2}(j,6); %indexL(i,j)
+                bL = 293;
+            end
+        end
+        if(P2 ~= 0)
+            if(P1 == 0)
+                Pseudorange(i,j)= P2; 
+                indexL = Observations{i,2}(j,10); %indexL(i,j)
+                bL = 29.3;
+            end
+        end    
+        
         %Pseudorange(i,j) = Observations{i,2}(j,3); %((f1^2)*P1 - (f2^2)*P2)/(f1^2-f2^2); %Calculating the uncorrected pseudorange
         index = Observations{i,2}(j,11); 
         sqrtA = Nav_data.data(index, 13); %Finding the semi-major axis
@@ -94,18 +124,21 @@ for i = 1:length(Observations) %Iterating through the number of observations
             diff = abs(Ek-Ek0);
             Ek0 = Ek;
             count = count +1;
-        end   
+        end 
+%         Ekexp = (ecc + (cos(Vk(i,j))))/(1 + ecc*(cos(Vk(i,j))));
+%         Ektest = acos(Ekexp);         
+%         diffEktest = Ek - Ektest;
         Toc = Nav_data.data(index, 24)*60*60*24*7 + Nav_data.data(index, 14); %Determining the clock data reference time of week
-        dTr = (-4.442807633e-10)*ecc*sqrtA*sin(Ek); %Relativistic clock correction term
+        dTr = (-4.442807633e-10)*ecc*sqrtA*sin(Ek); %Ek %Relativistic clock correction term
         dTsv(j) = Nav_data.data(index, 3) + Nav_data.data(index, 4)*(time-Toc) + Nav_data.data(index, 5)*((time-Toc)^2) + dTr; %Determining the satellite clock offset
-        Vk(i,j) = atan2((sqrt(1-ecc^2)*sin(Ek)/(1-ecc*cos(Ek))),((cos(Ek)-ecc)/(1-ecc*cos(Ek)))); %Determining the true anomaly
+        Vk(i,j) = atan2((sqrt(1-ecc^2)*sin(Ek)/(1-ecc*cos(Ek))),((cos(Ek)-ecc)/(1-ecc*cos(Ek)))); %Ek %Determining the true anomaly
         ArgLat(1) = Vk(i,j) + Nav_data.data(index, 20); %Finding the argument of latitude
         %The second harmonic perturbations
         ArgLat(2) = Nav_data.data(index, 12)*sin(2*ArgLat(1)) + Nav_data.data(index, 10)*cos(2*ArgLat(1)); %The argument of latitude correction
         ArgLat(3) = Nav_data.data(index, 7)*sin(2*ArgLat(1)) + Nav_data.data(index, 19)*cos(2*ArgLat(1)); %The radial correction
         ArgLat(4) = Nav_data.data(index, 17)*sin(2*ArgLat(1)) + Nav_data.data(index, 15)*cos(2*ArgLat(1)); %The inclination correction
         Corr(1) = ArgLat(1) + ArgLat(2); %The corrected argument of latitude
-        Corr(2) = A*(1-ecc*cos(Ek))+ArgLat(3); %The corrected radius
+        Corr(2) = A*(1-ecc*cos(Ek))+ArgLat(3); %Ek %The corrected radius
         Corr(3) = Nav_data.data(index, 18) + Nav_data.data(index, 22)*Tk + ArgLat(4); %The corrected inclination angle
         %Determining the positions in the orbital plane
         Xkprime = Corr(2)*cos(Corr(1)); 
@@ -127,6 +160,8 @@ for i = 1:length(Observations) %Iterating through the number of observations
         Approxcoord = Approx'; 
         LLHtrans = EC2LLH(VectorXYZ); %Calculating the latitude, longitude, and height of the ECEF coordinates
         LLHtrans(1:2) = LLHtrans(1:2)*pi/180; %Converting the result to radians
+        longit = LLHtrans(1); 
+        latit = LLHtrans(2); 
         LLH = LLHtrans';
         ENU = EC2ENU(VectorXYZ, Approxcoord, LLH); %Determining the easting, northing, and up from the ECEF coordinates
 
@@ -141,6 +176,74 @@ for i = 1:length(Observations) %Iterating through the number of observations
         Observations{i,2}(j,18) = elevationangle(j); %Storing the elevation angle
         Observations{i,2}(j,19) = azimuth(j); %Storing the zenith angle
 
+        %%ionospheric effect calculations
+        
+        if(P2 == 0)
+            orbitalw = 0.0137/((Observations{i,2}(j,18)) + 0.11) - 0.022; %Calculating the earth's central angle between the user position and the earth projection of ionospheric intersection point
+            %This is calculated using the elevation angle 
+        
+            thetai = latit + orbitalw*(cos(azimuth(j))); %Calculating the geodetic latitude of the earth projection fo the ionospheric intersection point 
+            %This is calculated using the user geodetic latitude, the earth's
+            %central angle, and the azimuth angle between the user and
+            %satellite
+        
+            %If the geodetic latitude of the earth projection falls between
+            %the constraints, it has to be corrected
+            if(thetai > 0.416)
+                thetai = 0.416; 
+            elseif(thetai < -0.416)
+                thetai = -0.416; 
+            else
+                thetai = thetai; 
+            end
+        
+            longitudei = longit + (orbitalw*(sin(azimuth(j))))/(cos(thetai)); %Calculating the geodetic longitude of the earth projection of the ionospheric intersection point
+            %This is calculated based on the user geodetic longitude in
+            %radians, the azimuth, and the geodetic lattiude of the earth
+            %projection of the ionospheric intersection point
+            geomaglat = thetai + 0.064*(cos(longitudei - 1.617)); %Geomagnetic latitude of the earth projection of the ionospheric intersection point
+            %This is calculated with the geodetic latitude of the earth projection and the geodetic longitude of the earth projection of the ionospheric intersection
+        
+            add = 0;
+            %Calulating PER based on the ionospheric beta coefficients and the
+            %geomagnetic magnitude
+            for t = 1:4
+                PER = (GPSB(t))*(geomaglat^(t-1));
+                PER = PER + add; 
+                add = PER;
+            end
+            if(PER < 72000)
+                PER = 72000; 
+            end
+        
+            timet = (4.32e4)*(longitudei) + Observations{j,1};
+            x = (2*pi*(timet - 50400))/PER; 
+        
+            sumadd = 0;
+            %Calulating AMP based on the ionospheric alpha coefficients and the
+            %geomagnetic magnitude
+            for t = 1:4
+                AMP = (GPSA(t))*(geomaglat^(t-1));
+                AMP = AMP + sumadd; 
+                sumadd = AMP;
+            end
+            if(AMP < 0)
+                AMP = 0; 
+            end
+        
+            F = 1.0 + 16.0*((0.53 - (elevationangle(j))*(1/pi))^3); %Calculating the obliquity factor based on the elevation angle
+        
+            if(abs(x) >= 1.57)
+                Tiono(i,j) = (3e8)*(F*(5.0e-9)); %Calculating the ionospheric correction model 
+            else
+                Texp = AMP*(1 - (x^2)/2 + (x^4)/24);
+                Tiono(i,j) = (3e8)*(F*((5.0e-9) + Texp)); %Calculating the ionospheric correction model
+            end
+        
+            corrPseudorange(i,j) = Pseudorange(i,j) + Tiono(i,j);
+        else
+            corrPseudorange(i,j) = Pseudorange(i,j); 
+        end
         
          %Constants to determine the tropospheric error
         Pwv = 16; 
@@ -151,7 +254,7 @@ for i = 1:length(Observations) %Iterating through the number of observations
         Observations{i,2}(j,20) = dtrop;
         
         %The corrected pseudorange
-        correctedpseudorange(i,j) = Pseudorange(i,j)- dtrop;
+        correctedpseudorange(i,j) = corrPseudorange(i,j) - dtrop; % + Tiono(i,j);
         
         %Storing the corrected pseudorange, satellite clock offest, and
         %ECEF Xk, Yk, and Zk values in the overall Observations matrix for
@@ -162,6 +265,9 @@ for i = 1:length(Observations) %Iterating through the number of observations
         Observations{i,2}(j,15) = Yk;
         Observations{i,2}(j,16) = Zk;
        
+        factorL = (-0.5*(indexL)/10);
+        testpower = power(10,factorL);
+        scalingfactor(i,j) = (bL)*testpower; %(-0.5*(factorL/10)));          
     end
     
     %Removing all satellites that are below 10 degrees
@@ -220,7 +326,8 @@ for i = 1:length(Observations) %Iterating through the number of observations
     
     for j = 1:obssize(1) %A for-loop to create the first design matrix
         %Determining the geometric range
-        geometricexpression = (Xs(j) - x0)^2 + (Ys(j)- y0)^2 + (Zs(j) - z0)^2;
+        %x0 = xcurrent, y0 = ycurrent, z0 = zcurrent
+        geometricexpression = (Xs(j) - xcurrent)^2 + (Ys(j)- ycurrent)^2 + (Zs(j) - zcurrent)^2;
         geometricinitial = sqrt(geometricexpression); %+c(dts-dtr)
 
         %The deriviatives for the X, Y, and Z receiver components and the
@@ -249,7 +356,7 @@ for i = 1:length(Observations) %Iterating through the number of observations
         Inverseterm = (A')*A; 
         Inverse = inv(Inverseterm); 
         deltax = Inverse*(A')*mis; 
-        xo = [x0; y0; z0; dtr0]; %The current approximations of the receiver position and clock offset
+        xo = [xcurrent; ycurrent; zcurrent; dtr0];  %[x0; y0; z0; dtr0]  %The current approximations of the receiver position and clock offset
         xhat = xo + deltax; %The current least squares estimates of the receiver position and clock offset
         
         %Setting the current approximations of the receiver position and clock offset to the current least squares estimates 
@@ -262,9 +369,9 @@ for i = 1:length(Observations) %Iterating through the number of observations
         count = count + 1; %Keeping track of how many iterations the loop makes
         if(all(abs(deltax) < thresh)) %If the delta values are less than the prescribed threshold values, the loop will break
             fprintf("Loop is broken");
-            resultcheck(i) = count; 
-            Final = xhat; %Storing the least squares estimates of the X, Y, and Z components of the receiver's position and the receiver clock offset
+            resultcheck(i) = count;
             v = A*deltax - mis; %Calculating the residuals
+            Final = xhat; %Storing the least squares estimates of the X, Y, and Z components of the receiver's position and the receiver clock offset
             Observations{i,2}(:,17) = v; %Storing the residuals 
             aposteriori = ((v')*v)/(j - 4); %Determining the a-posteriori variance factor
 %             Final(i,2) = aposteriori*Inverse;
@@ -291,6 +398,7 @@ for i = 1:length(Observations) %Iterating through the number of observations
     XYZTable = EC2LLH(TrueXYZ);
     Currentepoch = Observations{i,1};
     CombinedTable(i,:) = [XYZTable(1); XYZTable(2); XYZTable(3); Currentepoch];
+    XYZComparisonM(i,:) = [TrueXYZ(1); TrueXYZ(2); TrueXYZ(3); Currentepoch]; 
     
     TrueLLHtrans(1:2) = TrueLLHtrans(1:2)*pi/180;
     TrueLLH = TrueLLHtrans';
@@ -303,9 +411,68 @@ VT = table('Size',[size(CombinedTable)], 'VariableTypes', {'double', 'double', '
 VT{:,:}=CombinedTable;
 %writetable(VT,'residual_stats.csv');
 
+referenceresults = readmatrix('0105ground_truth.csv'); 
+
+referencecoordinates = referencecoordinates(referenceresults);
+
+measuredcoordinates = table2array(VT);
+% 
+% % for d = 1:length(measuredcoordinates)
+% %     latdiff(d,1) = abs(referencecoordinates(d,1) - measuredcoordinates(d,1)); 
+% %     longdiff(d,1) = abs(referencecoordinates(d,2) - measuredcoordinates(d,2)); 
+% % end
+% 
+
+convertreference = zeros(length(measuredcoordinates),4);
+for d = 1:length(measuredcoordinates)
+    convertreference(d,1:3) = lla2ecef([referencecoordinates(d,1),referencecoordinates(d,2),referencecoordinates(d,3)]);
+    convertreference(d,4) = referencecoordinates(d,4); 
+end
+
+for d = 1:length(measuredcoordinates)
+    errorinpositionX(d) = convertreference(d,1) - XYZComparisonM(d,1); %measuredcoordinates(d,1); 
+    errorinpositionY(d) = convertreference(d,2) - XYZComparisonM(d,2); %measuredcoordinates(d,2); 
+    errorinpositionZ(d) = convertreference(d,3) - XYZComparisonM(d,3); %measuredcoordinates(d,3); 
+    errorinpositionT(d) = convertreference(d,4) - XYZComparisonM(d,4); %measuredcoordinates(d,4); 
+end
+
+errorinpositionX = errorinpositionX.'; 
+errorinpositionY = errorinpositionY.'; 
+errorinpositionZ = errorinpositionZ.'; 
+errorinpositionT = errorinpositionT.'; 
+
+f7 = figure; 
+plot(errorinpositionX);
+hold on
+title('Error In X Position');
+ylabel('Error (Metres)'); 
+xlabel('Epoch Number');
+hold off
+
+
+f8 = figure; 
+plot(errorinpositionY);
+hold on
+title('Error In Y Position');
+ylabel('Error (Metres)'); 
+xlabel('Epoch Number');
+hold off
+
+
+f8 = figure; 
+plot(errorinpositionZ);
+hold on
+title('Error In Z Position');
+ylabel('Error (Metres)'); 
+xlabel('Epoch Number');
+hold off
+
+
 %Holds all of azimuth, elevation, and tropospheric data and sorts them by satellite rather
 %than by time for plotting purposes
-for i = 1:1748     %2880
+i = 0; j = 0;
+lengthplot = length(errorinpositionX);
+for i = 1:lengthplot  %1748     %2880
 	obs = size(Observations{i,2});
 	for j = 1:obs(1)
 		sat = Observations{i,2}(j,2);

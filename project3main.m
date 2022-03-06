@@ -401,7 +401,7 @@ hold on
 title('Residuals From The Least Squares Computations');
 ylabel('Residuals (Metres)'); 
 xlabel('Epoch Number');
-for i = 2:32
+for i = 2:32  %32
     plot(Observations{i,7});
 end
 hold off

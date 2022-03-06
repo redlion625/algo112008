@@ -22,7 +22,7 @@ function wgs = ec2llh (xyz)
 %  This function is based on one developed by the
 %  National Geodetic Survey, Rockville, Maryland.
 %
-f=1/298.257223563;
+f=1/298.257222101   %f=1/298.257223563;
 esq=f*(2-f);
 a=6378137;
 x = xyz(1);

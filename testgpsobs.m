@@ -26,7 +26,7 @@
 
 function obs = obs_read(filepath)
 %D:\Third Year\ESSE 3670\Project 3\Data Downloaded\datasets to try with\algo\algo112008\ALGO0010.08O
-file = fopen("Pixel4_GnssLog.21o");   %39ea118x.21o  %Pixel4_GnssLog.21o  %("Pixel4XLModded_GnssLog.20o");  %fopen("ALGO0010.08O");
+file = fopen("CorrectSamsungS20Ultra_GnssLog0428.21o"); %SamsungS20Ultra_GnssLog0429.21o   %SamsungS20Ultra_GnssLog0325.21o  %Pixel4XL_GnssLog0604.20o  %Mi8_GnssLog.20o   %SamsungS20Ultra_GnssLog.21o %Pixel4_GnssLog.21o  %Pixel4_GnssLog.txt %Pixel4_GnssL.20o   %Pixel4_GnssLog.20o  %39ea118x.21o  %Pixel4_GnssLog.21o  %("Pixel4XLModded_GnssLog.20o");  %fopen("ALGO0010.08O");
 disp('------------------Begin reading obs file---------------------');
 %read constant parameters
 curr_line = fgetl(file); %fget1 %fopen %fgetl
@@ -35,6 +35,7 @@ obs.pos_xyz = [];
 obs.ant_delta_HEN = [];
 obs.num_typeobs = [];
 obs.type_obs = [];
+obs.sum = []; 
 
 
 while isempty(strfind(curr_line,'END OF HEADER'))
@@ -95,7 +96,7 @@ while ~feof(file)
     sat_names = curr_line(:,1:3); % Sat names
     sat_names= sat_names(find(~isspace(sat_names))); %remove empty spaces
     %create array of sat PRN's without 'G'
-    sat_names = strsplit(sat_names,'G');
+    sat_names = strsplit(sat_names,'G'); %G
     sat_names = sat_names(~cellfun('isempty',sat_names));
     sat_PRN = zeros(num_sat,1);
     %store epoch time. CONVERT TO GPST and more
@@ -105,12 +106,12 @@ while ~feof(file)
     epoch_data(:,1) = sat_PRN;
     line = curr_line; 
     for j = 1:num_sat
-            str = 'G';
+            str = 'G';  %str = 'G';
             expression = line(1);
             startIndex = regexp(str,expression);
             if(startIndex > 0)
-                if(line(1) == 'G')
-                    epoch_data(j,1) = 1; 
+                if(line(1) == 'G') %if(line(1) == 'G')
+                    epoch_data(j,1) = 3; 
                     epoch_data(j,2) = str2num(line(2:3));
                     ta(j,2) = str2num(line(2:3));
                 
@@ -286,6 +287,7 @@ while ~feof(file)
     n = n + 1;
 end
 obs.data = data;
+obs.sum = n; 
 disp('----------------Completed reading obs file-------------------');
 fclose(file);
 end
