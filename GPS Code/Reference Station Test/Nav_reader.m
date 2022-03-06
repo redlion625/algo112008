@@ -1,82 +1,6 @@
 function [Nav] = Nav_reader(Navemerisfile)
 % Nav_reader reads RINEX v 3.04, mixed navigation file
-%
-% Arrangement of GPS Navigation array (Nav.data) 
-%
-%   j = line of data record in RINEX 3.04 file
-%         
-%   Column  Description
-% 
-% 	=====        
-%   j = 1
-% 	=====
-%         
-%   1       sat number (PRN)
-%   2       Time of clock in seconds since GPS reference epoch)
-%   3       SV clock bias
-%   4       SV clock drift
-%   5       SV clock drift rate
-%         
-% 	=====
-%   j = 2
-% 	=====
-%         
-%   6       Issue of data, ephemeris (IODE)
-% 	7       Crs in m
-% 	8       Delta in rad/sec
-% 	9       M0 in rad
-% 
-% 	=====
-% 	j = 3
-% 	=====
-% 
-% 	10      Time of ephemeris (Toe) in sec of GPS week
-% 	11      Cic in radians
-% 	12      OMEGA0 in radians
-% 	13      Cis in rad	
-% 
-% 	=====
-% 	j = 4
-% 	=====
-% 
-% 	14      Time of ephemeris (Toe) in sec of GPS week
-% 	15      Cic in radians
-% 	16      OMEGA0 in radians
-% 	17      Cis in rad
-% 
-% 	=====
-% 	j = 4
-% 	=====
-% 
-% 	18      i0 in rad
-% 	19      Crc in m
-% 	20      omega in rad	
-% 	21      OMEGA DOT in rad/sec
-% 
-% 	=====
-% 	j = 5
-% 	=====
-% 
-% 	22      IDOT in rad/sec
-% 	23      codes on L2 channel
-% 	24      Continuous GPS week number, not mod(1024)
-% 	25      L2 P data flag
-% 
-% 	=====
-% 	j = 6
-% 	=====
-% 
-% 	26      SV accuracy in m as per GPS ICD 200H Section 20.3.3.3.1.3
-% 	27      sv health
-% 	28      TGD in sec
-% 	29      Issue of date, Clock (IODC)
-% 
-% 	=====
-% 	j = 7
-% 	=====
-% 
-% 	30      Transmission time of message in sec of GPS week
-% 	31      Fit Interval
+
 tic
 disp('------------------Begin reading navigation file---------------------');
 RI = 1;         % receiver indicator defined here for now, later pull out from header.
@@ -193,6 +117,7 @@ while line~=-1      % do until end of file is reach where fgets returns -1
         line = fgets(fidobs);
 
     elseif line(1)=='R'
+        
         iGLO=iGLO+1;
         % give nav msg struct per epoch i header info
 
@@ -293,5 +218,83 @@ disp('----------------Completed reading nav file-------------------');
 fclose('all');
 toc
 %%%%%%%%% end Nav_reader.m %%%%%%%%%
+
+% Arrangement of GPS Navigation array (Nav.data) 
+%
+%   j = line of data record in RINEX 3.04 file
+%         
+%   Column  Description
+% 
+% 	=====        
+%   j = 1
+% 	=====
+%         
+%   1       sat number (PRN)
+%   2       Time of clock in seconds since GPS reference epoch
+%   3       SV clock bias
+%   4       SV clock drift
+%   5       SV clock drift rate
+%         
+% 	=====
+%   j = 2
+% 	=====
+%         
+%   6       Issue of data, ephemeris (IODE)
+% 	7       Crs in m
+% 	8       Delta in rad/sec
+% 	9       M0 in rad
+% 
+% 	=====
+% 	j = 3
+% 	=====
+% 
+% 	10      Time of ephemeris (Toe) in sec of GPS week
+% 	11      Cic in radians
+% 	12      OMEGA0 in radians
+% 	13      Cis in rad	
+% 
+% 	=====
+% 	j = 4
+% 	=====
+% 
+% 	14      Time of ephemeris (Toe) in sec of GPS week
+% 	15      Cic in radians
+% 	16      OMEGA0 in radians
+% 	17      Cis in rad
+% 
+% 	=====
+% 	j = 4
+% 	=====
+% 
+% 	18      i0 in rad
+% 	19      Crc in m
+% 	20      omega in rad	
+% 	21      OMEGA DOT in rad/sec
+% 
+% 	=====
+% 	j = 5
+% 	=====
+% 
+% 	22      IDOT in rad/sec
+% 	23      codes on L2 channel
+% 	24      Continuous GPS week number, not mod(1024)
+% 	25      L2 P data flag
+% 
+% 	=====
+% 	j = 6
+% 	=====
+% 
+% 	26      SV accuracy in m as per GPS ICD 200H Section 20.3.3.3.1.3
+% 	27      sv health
+% 	28      TGD in sec
+% 	29      Issue of date, Clock (IODC)
+% 
+% 	=====
+% 	j = 7
+% 	=====
+% 
+% 	30      Transmission time of message in sec of GPS week
+% 	31      Fit Interval
+
 
 %Navigationtime = Nav.data.data(:,2);

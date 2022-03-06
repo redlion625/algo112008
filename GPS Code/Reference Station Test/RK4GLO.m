@@ -1,4 +1,4 @@
-function [x1,y1,z1] = RK4GLO(te, ti, x0, y0, z0, Vx0, Vy0, Vz0, AxLS, AyLS, AzLS)
+function P1 = RK4GLO(te, ti, x0, y0, z0, Vx0, Vy0, Vz0, AxLS, AyLS, AzLS)
 % RK4GLO calculates position at updated epoch ti of GLONASS satellite given initial
 % positions and velocities of satellite at a reference epoch te using 4th order Runge-Kutta
 % or RK4 numerical integration method of the differential equations
@@ -67,9 +67,9 @@ o4 = Vz0 + h*L3;
 % K4 = getAy(xstep, ystep, zstep, AyLS);
 % L4 = getAz(xstep, ystep, zstep, AzLS);
 
-x1 = x0 + (h/6)*(m1 + 2*m2 + 2*m3 + m4);
-y1 = y0 + (h/6)*(n1 + 2*n2 + 2*n3 + n4);
-z1 = z0 + (h/6)*(o1 + 2*o2 + 2*o3 + o4);
+P1 = [x0 + (h/6)*(m1 + 2*m2 + 2*m3 + m4);...
+    y0 + (h/6)*(n1 + 2*n2 + 2*n3 + n4);...
+    z0 + (h/6)*(o1 + 2*o2 + 2*o3 + o4)];
 
     function Ax = getAx(x, y, z, AxLS)
         

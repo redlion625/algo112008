@@ -19,7 +19,7 @@ while ~contains(line,'END OF HEADER')
     line = fgetl(fid);
 end
 if isempty(obs.interval)
-    epoch = cell(1,2);
+    epoch = cell(1,3);
 else
     epoch = cell(Const.DAYSEC/obs.interval,2);
 end
@@ -34,6 +34,9 @@ while ~feof(fid)
         linesplit = fixedWidth(line,[3*ones(1,5) 11 3 3 36]);
         ymdhms = str2double(linesplit(1:6));
         numsat = str2num(linesplit(8));
+        
+        epoch{count,3}=ymdhms; % calendar time GPST
+        epoch{count,4}=ymdhms(4)*3600+ymdhms(5)*60+ymdhms(6); % second of day GPST
         
         epoch{count,1} = cal2gps(2000+ymdhms(1),ymdhms(2),...
             ymdhms(3),ymdhms(4),ymdhms(5),ymdhms(6));

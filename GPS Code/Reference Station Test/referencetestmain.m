@@ -24,7 +24,7 @@ addpath(genpath('lib'));
 
 obsfilename = "algo1180.21o";
 
-Nav = Nav_reader("brdm1180.21p");
+Nav = glonavread("brdc1180.21g");
 Obs = obs_read_rinex211(obsfilename);  %Pixel4_GnssLog.21o %39ea118x.21o
 
 %dateOfObs = dateOfFirstObs(obsfilename);
@@ -35,16 +35,16 @@ Obs = obs_read_rinex211(obsfilename);  %Pixel4_GnssLog.21o %39ea118x.21o
 % GMST at 0h of observation date
 obsdatevec = Obs.date_obs;
 obs = Obs.epochdata;
-if isempty(Obs.date_obs)
-    error('Calendar date of observations not found');
-else
-    gmst0 = gmstGLO(obsdatevec(1),obsdatevec(2),obsdatevec(3),0,0,0);
-end
+% if isempty(Obs.date_obs)
+%     error('Calendar date of observations not found');
+% else
+%     gmst0 = gmstGLO(obsdatevec(1),obsdatevec(2),obsdatevec(3),0,0,0);
+% end
 % Julian day number of observation
 jd0 = greg2jd(obsdatevec(1),obsdatevec(2),obsdatevec(3),0,0,0);
 
 %% Match observation and navigation data
-obs = Obs.epochdata(:,1:2);
+obs = Obs.epochdata;
 gloobs = Obs.epochdata(:,[1 2]);
 %obssize = size(Observations{1,2}); % Determining the number of observations
 n_gpsrecords = size(Nav.data,1); % The total number of GPS ephemeris data records
@@ -89,7 +89,7 @@ for i = 1:length(obs)
         %         index = I(P); %Saving the minimum matched index for current reference
         %         minInd == index;
         
-        % super secret test case
+
         %         if minInd ~= index
         %             error('aha');
         %         end
@@ -105,7 +105,6 @@ earthrotation = Const.OMEGAE; %WGS84 value of the Earth's rotation rate
 c = Const.CMPS; %Speed of light
 xapprox=0;yapprox=0;zapprox=0;
 num_epoch = length(obs);
-
 % Reserve index:
 %   i   for iterating through each epoch of observation
 %   j   for iterating through every observation in the epoch of a
@@ -113,92 +112,113 @@ num_epoch = length(obs);
 
 for i = 1:num_epoch %Iterating through every epoch
     
-    obssize = size(obs{i,2}); %Determining the size of the submatrix attached to the epoch of observations
+    obssize = size(obs{i,2},1); %Determining the size of the submatrix attached to the epoch of observations
     clear elevationangle azimuth dTsv L
     remove = [];
     %if(i == 1)
-     %   continue
+    %   continue
     %else
-        numglo = 0;
-        XYZsat = zeros(1,3);
-        for j = 1:obssize(1) %Iterating through the GPS submatrix attached to the observation epoch
+    numglo = 0;
+    XYZsat = zeros(1,3);
+    for j = 1:obssize(1) %Iterating through the GPS submatrix attached to the observation epoch
+        
+        if obs{i,2}(j,1)==2
+            numglo = numglo + 1;
+            obssize = size(obs{i,2});
             
-            if obs{i,2}(j,1)==2
-                numglo = numglo + 1;
-                obssize = size(obs{i,2});
-                
-                %num_gloobs = size(gloobs{i,2},1);
-                
-                % Processing GLONASS observations at epoch i
-                
-                trec = obs{i,1}; % receiver time in seconds since GPS epoch
-                satnumobs = obs{i,2}(j,2);
-                
-                %for j = 1:num_gloobs
-                
-                % find navigation parameters closest in time with receiver time
-                iNav = ephMatch(satnumobs,trec,...
-                    Nav.glonav.satnum,...
-                    Nav.glonav.gpst);
-                % (Nav.glonav.gpst(indexnav) - trec)/60
-                PR = obs{i,2}(j,3);%-Const.CMPS*Const.GPSUTC;
-                % time of transmission
-                
-                te = Nav.glonav.gpst(iNav);
-                
-                ti = emissionTime(PR,trec,...
-                    te,...
-                    Nav.glonav.mTauN(iNav),...
-                    Nav.glonav.GammaN(iNav),...
-                    0);
-                
-                % emission time in seconds of the day
-                ti_sod = ti - (jd0 - Const.DJGPS)*Const.DAYSEC;
-                te_sod = te - (jd0 - Const.DJGPS)*Const.DAYSEC;
-                dt = ti_sod-te_sod;
-                % Greenwich sidereal time at receiver time
-                Se = gmst0 + Const.OMEGAE*te_sod;
-                
-                x0 = Nav.glonav.xpos(iNav);
-                y0 = Nav.glonav.ypos(iNav);
-                z0 = Nav.glonav.zpos(iNav);
-                vx0 = Nav.glonav.xvel(iNav);
-                vy0 = Nav.glonav.yvel(iNav);
-                vz0 = Nav.glonav.zvel(iNav);
-                Ax0 = Nav.glonav.xacc(iNav);
-                Ay0 = Nav.glonav.yacc(iNav);
-                Az0 = Nav.glonav.zacc(iNav);
-                
-                % transform ephemeris parameters from ECEF PZ90.11 system to inertial
-                [x0,y0,z0] = rotatez(x0,y0,z0,Se);
-                [vx0,vy0,vz0] = rotatez(vx0,vy0,vz0,Se);
-                vx0 = vx0-Const.OMEGAE*y0;
-                vy0 = vy0+Const.OMEGAE*x0;
-                [Ax0,Ay0,Az0] = rotatez(Ax0,Ay0,Az0,Se);
-                
-                % Numerical integration of satellite motion via RK4
-                [x,y,z] = RK4GLO(te_sod,ti_sod,x0,y0,z0,vx0,vy0,vz0,0,0,0);
-                dx = Ax0*dt^2/2;dy = Ay0*dt^2/2; dz = Az0*dt^2/2;
-                x=x+dx;y=y+dy;z=z+dz;
-                % rotate back to PZ90.11
-                Si = gmst0 + Const.OMEGAE*ti_sod;
-                [x,y,z] = rotatez(x,y,z,-Si);
-                
-                % Transformation between PZ90.11 to ITRF2008
-                % using cartesian transformation parameters from
-                % https://eng.mil.ru/files/PZ-90.11_final-v8.pdf
-                xyz = cart2cart([x; y; z], ...
-                    [-0.003; -0.001; 0],...
-                    [0;0;0],...
-                    ...%[0.019; -0.042; 0.002]*Const.DMAS2R,...
-                    0);
-                %xyz = [x;y;z];
-                
-                obs{i,2}(j,11:13)=xyz';
-                XYZsat(numglo,:) = xyz';
-                L(numglo) = PR;
+            %num_gloobs = size(gloobs{i,2},1);
+            
+            % Processing GLONASS observations at epoch i
+            
+            trec = obs{i,4}-Nav.LS; % receiver time in sod UTC
+            
+            %satnumobs = obs{i,2}(j,2);
+            
+            %for j = 1:num_gloobs
+            
+            
+            % find navigation parameters closest in time with receiver time
+            iNav = ephMatch(obs{i,2}(j,2),trec,...
+                Nav.data.satnum,...
+                Nav.data.sod);
+            % (Nav.data.gpst(indexnav) - trec)/60
+            PR = obs{i,2}(j,3)-Const.CMPS*(Nav.LS-Nav.mTauC);
+            % time of transmission
+            
+            te = Nav.data.sod(iNav);
+            
+            ti=trec-PR/c;
+            
+            dtsv=ti-te;
+            for s=1:2
+                dtsv=dtsv+Nav.data.mTauN(iNav)-Nav.data.GammaN(iNav)*dtsv;
             end
+            dtsv=-Nav.data.mTauN(iNav)+Nav.data.GammaN(iNav)*dtsv;
             
+            ti=ti-dtsv;
+            
+            
+            %ti=ti-Nav.data.mTauN(iNav)-Nav.data.GammaN(iNav)*(ti-te);%-Nav.mTauC;
+            
+            %h=ti-te;
+            x=simpleRK4(ti-te,...
+                [Nav.data.xpos(iNav);Nav.data.ypos(iNav);Nav.data.zpos(iNav);...
+                Nav.data.xvel(iNav);Nav.data.yvel(iNav);Nav.data.zvel(iNav)],...
+                [Nav.data.xacc(iNav);Nav.data.yacc(iNav);Nav.data.zacc(iNav)]);
+            
+            %                 ti = emissionTime(PR,trec,te,...
+            %                     Nav.data.mTauN(iNav)+Nav.mTauC,...
+            %                     Nav.data.GammaN(iNav),...
+            %                     0);
+            
+            % emission time in seconds of the day
+            %ti_sod = ti - (jd0 - Const.DJGPS)*Const.DAYSEC;
+            %te_sod = te - (jd0 - Const.DJGPS)*Const.DAYSEC;
+            %                 dt = ti_sod-te_sod;
+            %                 % Greenwich sidereal time at receiver time
+            %
+            %                 Se = gmst0 + Const.OMEGAE*te;%Se=-Se;
+            %
+            %                 x0 = Nav.data.xpos(iNav);
+            %                 y0 = Nav.data.ypos(iNav);
+            %                 z0 = Nav.data.zpos(iNav);
+            %                 vx0 = Nav.data.xvel(iNav);
+            %                 vy0 = Nav.data.yvel(iNav);
+            %                 vz0 = Nav.data.zvel(iNav);
+            %                 Ax0 = Nav.data.xacc(iNav);
+            %                 Ay0 = Nav.data.yacc(iNav);
+            %                 Az0 = Nav.data.zacc(iNav);
+            %
+            %                 % transform ephemeris parameters from ECEF PZ90.11 system to inertial
+            %                 [x0,y0,z0] = rotatez(x0,y0,z0,Se);
+            %                 [vx0,vy0,vz0] = rotatez(vx0,vy0,vz0,Se);
+            %                 vx0 = vx0-Const.OMEGAE*y0;
+            %                 vy0 = vy0+Const.OMEGAE*x0;
+            %                 [Ax0,Ay0,Az0] = rotatez(Ax0,Ay0,Az0,Se);
+            %
+            %                 % Numerical integration of satellite motion via RK4
+            %                 [x,y,z] = RK4GLO(te_sod,ti_sod,x0,y0,z0,vx0,vy0,vz0,0,0,0);
+            %                 dx = Ax0*dt^2/2;dy = Ay0*dt^2/2; dz = Az0*dt^2/2;
+            %                 x=x+dx;y=y+dy;z=z+dz;
+            %                 % rotate back to PZ90.11
+            %                 Si = gmst0 + Const.OMEGAE*ti_sod;%Si=-Si;
+            %                 [x,y,z] = rotatez(x,y,z,-Si);
+            
+            % Transformation between PZ90.11 to ITRF2008
+            % using cartesian transformation parameters from
+            % https://eng.mil.ru/files/PZ-90.11_final-v8.pdf
+%             xyz = cart2cart([x; y; z], ...
+%                 [-0.003; -0.001; 0],...
+%                 [0;0;0],...
+%                 ...%[0.019; -0.042; 0.002]*Const.DMAS2R,...
+%                 0);
+            %xyz = [x;y;z];
+            
+            obs{i,2}(j,11:13)=x(1:3)';
+            XYZsat(numglo,:) = x(1:3)';
+            L(numglo) = PR;
+        end
+        
         %end
     end
     %%%%%
@@ -258,7 +278,7 @@ VT = table('Size',[size(CombinedTable)], 'VariableTypes', {'double', 'double', '
 VT{:,:}=CombinedTable;
 writetable(VT,'LLH_T.csv');
 
-scatter(DX,DY)
+plot(DX,DY)
 
 if 1
     
