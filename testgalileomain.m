@@ -398,7 +398,7 @@ for i = 1:length(Observations) %Iterating through the number of observations
     %into Easting, Northing, and Up
     TrueXYZ = [Final(1:3)];
     
-    TrueTestENU = EC2ENU(TrueXYZ); 
+    %TrueTestENU = EC2ENU(TrueXYZ); 
     
     TrueLLHtrans = EC2LLH(TrueXYZ);
     XYZTable = EC2LLH(TrueXYZ);
@@ -433,16 +433,24 @@ end
 convertreference = zeros(length(measuredcoordinates),4);
 for d = 1:length(measuredcoordinates)
     convertreference(d,1:3) = lla2ecef([referencecoordinates(d,1),referencecoordinates(d,2),referencecoordinates(d,3)]);
+    convertENU(d,1:3) = EC2ENU(convertreference(d,1:3), 0, referencecoordinates(d,1:3)); 
     convertreference(d,4) = referencecoordinates(d,4); 
+end
+
+for d = 1:length(convertENU)
+    errorinpositionX(d) = convertENU(d,1) - TrueENU(d,1); %measuredcoordinates(d,1); 
+    errorinpositionY(d) = convertENU(d,2) - TrueENU(d,2); %measuredcoordinates(d,2); 
+    errorinpositionZ(d) = convertENU(d,3) - TrueENU(d,3); %measuredcoordinates(d,3); 
+    %errorinpositionT(d) = convertENU(d,4) - XYZComparisonM(d,4); %measuredcoordinates(d,4); 
 end
 
 
 
 for d = 1:length(measuredcoordinates)
-    errorinpositionX(d) = convertreference(d,1) - XYZComparisonM(d,1); %measuredcoordinates(d,1); 
-    errorinpositionY(d) = convertreference(d,2) - XYZComparisonM(d,2); %measuredcoordinates(d,2); 
-    errorinpositionZ(d) = convertreference(d,3) - XYZComparisonM(d,3); %measuredcoordinates(d,3); 
-    errorinpositionT(d) = convertreference(d,4) - XYZComparisonM(d,4); %measuredcoordinates(d,4); 
+    testerrorinpositionX(d) = convertreference(d,1) - XYZComparisonM(d,1); %measuredcoordinates(d,1); 
+    testerrorinpositionY(d) = convertreference(d,2) - XYZComparisonM(d,2); %measuredcoordinates(d,2); 
+    testerrorinpositionZ(d) = convertreference(d,3) - XYZComparisonM(d,3); %measuredcoordinates(d,3); 
+    testerrorinpositionT(d) = convertreference(d,4) - XYZComparisonM(d,4); %measuredcoordinates(d,4); 
 end
 
 errorinpositionX = errorinpositionX.'; 
